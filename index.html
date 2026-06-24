@@ -1877,9 +1877,9 @@
     startExamBtn.onclick = () => {
       document.getElementById('preExamModal').classList.remove('show');
       
-      // Move streams to topbar
-      if(camStream) { topCamVideo.style.display = 'block'; document.getElementById('camPlaceholder').style.display = 'none'; }
-      if(screenStream) { topScreenVideo.style.display = 'block'; document.getElementById('screenPlaceholder').style.display = 'none'; }
+      // Remove placeholders
+      document.getElementById('camPlaceholder').style.display = 'none';
+      document.getElementById('screenPlaceholder').style.display = 'none';
       
       initGrid();
       renderQuestion();
@@ -1893,10 +1893,6 @@
 
     function finishExam() {
       clearInterval(timerInt);
-      
-      // Stop streams
-      if(camStream) camStream.getTracks().forEach(t => t.stop());
-      if(screenStream) screenStream.getTracks().forEach(t => t.stop());
 
       let correct = 0, wrong = 0, empty = 0;
       answers.forEach((ans, i) => {
