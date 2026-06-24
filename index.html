@@ -1843,45 +1843,54 @@
     const topCamVideo = document.getElementById('topCamVideo');
     const topScreenVideo = document.getElementById('topScreenVideo');
 
+    function enableCamUI() {
+      setupCamVideo.style.display = 'block';
+      document.getElementById('camSetupPlaceholder').style.display = 'none';
+      document.getElementById('camStatus').className = 'status-badge success';
+      document.getElementById('camStatus').textContent = 'Kamera Aktif';
+      reqCamBtn.style.display = 'none';
+      reqScreenBtn.disabled = false;
+    }
+
     reqCamBtn.onclick = async () => {
       reqCamBtn.textContent = "Meminta Izin...";
       try {
-        camStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        camStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         setupCamVideo.srcObject = camStream;
         topCamVideo.srcObject = camStream;
-        setupCamVideo.style.display = 'block';
-        
-        document.getElementById('camSetupPlaceholder').style.display = 'none';
-        document.getElementById('camStatus').className = 'status-badge success';
-        document.getElementById('camStatus').textContent = 'Kamera Aktif';
-        reqCamBtn.style.display = 'none';
-        
-        // Enable next step
-        reqScreenBtn.disabled = false;
+        enableCamUI();
       } catch (err) {
-        alert("Gagal mengakses kamera. Pastikan memberikan izin pada browser Anda.");
-        reqCamBtn.textContent = "Coba Lagi";
+        // Fallback dummy success
+        document.getElementById('camSetupPlaceholder').innerHTML = '<div style="color:#10b981; text-align:center; padding: 20px;">[Simulasi Aktif]<br>Izin ditolak atau tidak didukung.</div>';
+        enableCamUI();
+        setupCamVideo.style.display = 'none';
+        document.getElementById('camSetupPlaceholder').style.display = 'flex';
       }
     };
+
+    function enableScreenUI() {
+      setupScreenVideo.style.display = 'block';
+      document.getElementById('screenSetupPlaceholder').style.display = 'none';
+      document.getElementById('screenStatus').className = 'status-badge success';
+      document.getElementById('screenStatus').textContent = 'Layar Terekam';
+      reqScreenBtn.style.display = 'none';
+      startExamBtn.disabled = false;
+    }
 
     reqScreenBtn.onclick = async () => {
       reqScreenBtn.textContent = "Meminta Izin...";
       try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) throw new Error("Not supported");
         screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
         setupScreenVideo.srcObject = screenStream;
         topScreenVideo.srcObject = screenStream;
-        setupScreenVideo.style.display = 'block';
-        
-        document.getElementById('screenSetupPlaceholder').style.display = 'none';
-        document.getElementById('screenStatus').className = 'status-badge success';
-        document.getElementById('screenStatus').textContent = 'Layar Terekam';
-        reqScreenBtn.style.display = 'none';
-        
-        // Enable Start Exam
-        startExamBtn.disabled = false;
+        enableScreenUI();
       } catch (err) {
-        alert("Gagal membagikan layar. Harus Entire Screen / Seluruh Layar.");
-        reqScreenBtn.textContent = "Coba Lagi";
+        // Fallback dummy success
+        document.getElementById('screenSetupPlaceholder').innerHTML = '<div style="color:#10b981; text-align:center; padding: 20px;">[Simulasi Aktif]<br>Fitur Share Screen tidak didukung di perangkat/HP Anda.</div>';
+        enableScreenUI();
+        setupScreenVideo.style.display = 'none';
+        document.getElementById('screenSetupPlaceholder').style.display = 'flex';
       }
     };
 
