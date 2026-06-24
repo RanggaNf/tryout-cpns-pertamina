@@ -2,800 +2,418 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>Simulasi CBT TPA</title>
+  <title>Simulasi CBT TPA - PT. Pertamina Hulu Rokan</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #007bff;
-      --primary-dark: #0056b3;
-      --bg: #f5f9ff;
-      --border: #d9e2f3;
-      --text: #333;
-      --muted: #777;
-      --danger: #e53935;
-
-      --green: #43a047;
-      --green-light: #e8f5e9;
-      --red: #e53935;
-      --red-light: #ffebee;
-      --grey-light: #eceff1;
-      --blue-soft: #e3f2fd;
+      --primary: #0056b3; /* Pertamina Blue */
+      --primary-light: #3385ff;
+      --primary-dark: #003d82;
+      --secondary: #00a950; /* Pertamina Green */
+      --bg-gradient: linear-gradient(135deg, #eef2f9 0%, #d8e4f8 100%);
+      --glass-bg: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.6);
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --radius-lg: 20px;
+      --radius-md: 12px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 
     body {
-      background: #e5edf8;
-      color: var(--text);
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Abstract background shapes */
+    .bg-shape {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: -1;
+      opacity: 0.6;
+      animation: float 10s infinite alternate;
+    }
+    .shape-1 { width: 400px; height: 400px; background: #3b82f6; top: -100px; left: -100px; animation-delay: 0s; }
+    .shape-2 { width: 300px; height: 300px; background: #10b981; bottom: -50px; right: -50px; animation-delay: -5s; }
+
+    @keyframes float {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(30px, 30px) scale(1.1); }
+    }
+
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
     }
 
     .cbt-container {
-      max-width: 1200px;
-      margin: 20px auto;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-      overflow: hidden;
+      width: 100%;
+      max-width: 1300px;
+      height: 90vh;
       display: flex;
       flex-direction: column;
-      min-height: 80vh;
+      overflow: hidden;
+      position: relative;
     }
 
     /* TOP BAR */
-    .topbar-center {
-      flex: 1;
-      text-align: center;
-      padding: 0 15px;
-    }
-
-    .header-title {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--primary-dark);
-      margin: 0;
-      letter-spacing: 0.5px;
-    }
-    
-    @media (max-width: 768px) {
-      .header-title {
-        font-size: 18px;
-      }
-    }
-
     .cbt-topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 18px;
-      background: #f3f6fb;
-      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      background: rgba(255,255,255,0.5);
     }
 
-    .topbar-left {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
+    .topbar-left { display: flex; gap: 12px; align-items: center; }
 
     .preview-box {
-      width: 150px;
-      height: 80px;
-      background: #fff;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      color: var(--muted);
-      overflow: hidden;
+      width: 140px; height: 75px;
+      background: #000;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 11px; font-weight: 500;
+      overflow: hidden; position: relative;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
     }
-
-    .preview-box.small {
-      width: 150px;
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .timer {
-      font-size: 20px;
-      font-weight: 600;
-      letter-spacing: 1px;
-    }
-
-    .btn-submit {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 8px 18px;
-      background: var(--primary);
-      color: #fff;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .btn-submit:hover {
-      background: var(--primary-dark);
-    }
-
-    .btn-submit-icon {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 2px solid #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-    }
-
-    /* MAIN LAYOUT */
-
-    .cbt-main {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      min-height: 0;
-      flex: 1;
-    }
-
-    .cbt-question-panel {
-      padding: 20px 24px;
-      border-right: 1px solid var(--border);
-      background: var(--bg);
-    }
-
-    .cbt-sidebar {
-      padding: 20px 20px;
-      background: #fff;
-    }
-
-    /* QUESTION HEADER */
-
-    .question-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
-    .question-title {
-      font-size: 22px;
-      font-weight: 600;
-      color: var(--primary-dark);
-    }
-
-    .question-nav-buttons {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn-nav {
-      min-width: 110px;
-      padding: 8px 14px;
-      border-radius: 4px;
-      border: 1px solid var(--primary);
-      background: #fff;
-      color: var(--primary-dark);
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .btn-nav.primary {
-      background: var(--primary);
-      color: #fff;
-    }
-
-    .btn-nav:disabled {
-      opacity: 0.4;
-      cursor: default;
-    }
-
-    /* QUESTION CARD */
-
-    .question-card {
-      position: relative;
-      background: #fafdff;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      padding: 18px 20px 24px;
-      min-height: 340px;
-      overflow: hidden;
-    }
-
-    .question-watermark {
-      position: absolute;
-      right: 30px;
-      bottom: 10px;
-      font-size: 120px;
-      font-weight: 700;
-      color: rgba(200, 220, 250, 0.75);
-      pointer-events: none;
-      user-select: none;
-    }
-
-    .question-text {
-      margin-bottom: 18px;
-      font-size: 15px;
-      line-height: 1.5;
-      color: var(--text);
-      max-width: 90%;
-    }
-
-    .options-list {
-      margin-top: 6px;
-    }
-
-    .option-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .option-item input[type="radio"] {
-      margin-top: 3px;
-      cursor: pointer;
-    }
-
-    .option-label {
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    /* SIDEBAR */
-
-    .sidebar-title {
-      font-weight: 600;
-      font-size: 16px;
-      margin-bottom: 12px;
-    }
-
-    .question-grid {
-      display: grid;
-      grid-template-columns: repeat(10, 1fr);
-      gap: 6px;
-      margin-bottom: 16px;
-    }
-
-    .question-number {
-      width: 32px;
-      height: 32px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      background: #f6f8fc;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .question-number.active {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary-dark);
-    }
-
-    .question-number.answered {
-      background: #c8e6c9;
-      border-color: #66bb6a;
-      color: #1b5e20;
-    }
-
-    .legend {
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 4px;
-    }
-
-    .legend-color {
-      width: 16px;
-      height: 16px;
-      border-radius: 3px;
-      border: 1px solid var(--border);
-    }
-
-    .legend-color.active {
-      background: var(--primary);
-      border-color: var(--primary-dark);
-    }
-
-    .legend-color.answered {
-      background: #c8e6c9;
-      border-color: #66bb6a;
-    }
-
-    .legend-color.unanswered {
-      background: #f6f8fc;
-    }
-
-    /* OVERLAY (ketentuan & hasil) */
-
-    .overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-    }
-
-    .overlay.hidden {
+    
+    .preview-box video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      position: absolute; top: 0; left: 0;
       display: none;
     }
 
-    .start-card,
-    .result-card {
-      background: #fff;
-      border-radius: 10px;
-      max-width: 960px;
-      width: 92%;
-      max-height: 90vh;
-      padding: 24px 26px;
+    .topbar-center { flex: 1; text-align: center; }
+    .header-title { font-size: 20px; font-weight: 700; color: var(--primary-dark); letter-spacing: -0.5px; }
+    .header-subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+
+    .topbar-right { display: flex; align-items: center; gap: 20px; }
+
+    .timer-badge {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 18px; font-weight: 700;
+      color: var(--primary-dark);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--glass-border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .timer-badge.danger { color: var(--danger); animation: pulse 1s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: none; cursor: pointer;
+      font-size: 14px; font-weight: 600;
+      transition: var(--transition);
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(0, 86, 179, 0.3); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 86, 179, 0.4); }
+    .btn-success { background: var(--secondary); color: #fff; box-shadow: 0 4px 14px rgba(0, 169, 80, 0.3); }
+    .btn-success:hover { background: #008f43; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 169, 80, 0.4); }
+    .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+    .btn-outline:hover { background: rgba(0, 86, 179, 0.05); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+    /* MAIN CONTENT */
+    .cbt-main { display: flex; flex: 1; min-height: 0; }
+    
+    .cbt-content {
+      flex: 1; padding: 30px;
       overflow-y: auto;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      display: flex; flex-direction: column;
     }
 
-    .start-card h2,
-    .result-card h2 {
-      margin-bottom: 12px;
+    .question-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .q-number-badge {
+      background: var(--primary-light); color: #fff;
+      padding: 6px 16px; border-radius: 8px;
+      font-size: 14px; font-weight: 700;
+      box-shadow: 0 4px 10px rgba(51, 133, 255, 0.3);
+    }
+    
+    .question-nav { display: flex; gap: 12px; }
+
+    .question-card {
+      background: #fff; border-radius: var(--radius-md);
+      padding: 30px; box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0,0,0,0.04);
+      flex: 1; position: relative; overflow: hidden;
+      animation: fadeIn 0.4s ease forwards;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .q-watermark {
+      position: absolute; right: 20px; bottom: -10px;
+      font-size: 150px; font-weight: 800; color: rgba(240, 244, 250, 0.6);
+      pointer-events: none; user-select: none; z-index: 0;
     }
 
-    .start-card ol {
-      margin-left: 18px;
-      margin-bottom: 16px;
-      font-size: 14px;
-      line-height: 1.4;
+    .q-text { font-size: 17px; line-height: 1.6; color: var(--text-main); margin-bottom: 24px; position: relative; z-index: 1; font-weight: 500; }
+    
+    .options-list { display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; }
+    
+    .option-label {
+      display: flex; align-items: flex-start; padding: 14px 18px;
+      background: #f8fafc; border: 2px solid #e2e8f0;
+      border-radius: 10px; cursor: pointer; transition: var(--transition);
     }
-
-    .start-card li + li {
-      margin-top: 4px;
+    .option-label:hover { background: #f1f5f9; border-color: #cbd5e1; }
+    .option-label.selected { background: #eff6ff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(0, 86, 179, 0.1); }
+    
+    .option-label input { display: none; }
+    .opt-letter {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: #e2e8f0; color: #475569;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px; margin-right: 14px;
+      transition: var(--transition); flex-shrink: 0;
     }
+    .option-label.selected .opt-letter { background: var(--primary); color: #fff; }
+    .opt-text { font-size: 15px; color: var(--text-main); line-height: 1.5; padding-top: 3px; }
 
-    .start-card ul {
-      margin-left: 18px;
-      margin-top: 4px;
+    /* SIDEBAR */
+    .cbt-sidebar {
+      width: 320px; background: rgba(255,255,255,0.6);
+      border-left: 1px solid rgba(0,0,0,0.05);
+      padding: 24px; display: flex; flex-direction: column;
     }
-
-    .btn-start {
-      margin-top: 10px;
-      padding: 10px 18px;
-      border-radius: 999px;
-      border: none;
-      background: var(--primary);
-      color: #fff;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
+    .sidebar-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--text-main); }
+    
+    .grid-container {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+      overflow-y: auto; padding-right: 4px; padding-bottom: 20px;
     }
+    .grid-container::-webkit-scrollbar { width: 6px; }
+    .grid-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-    .btn-start:hover {
-      background: var(--primary-dark);
+    .num-btn {
+      aspect-ratio: 1; border-radius: 8px;
+      border: 1px solid #cbd5e1; background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; color: var(--text-muted);
+      cursor: pointer; transition: var(--transition);
     }
+    .num-btn:hover { border-color: var(--primary-light); color: var(--primary); }
+    .num-btn.answered { background: var(--secondary); color: #fff; border-color: var(--secondary); box-shadow: 0 2px 6px rgba(0, 169, 80, 0.3); }
+    .num-btn.active { border: 2px solid var(--primary); transform: scale(1.1); font-weight: 700; color: var(--primary); }
+    .num-btn.answered.active { background: var(--secondary); color: #fff; border: 2px solid var(--primary-dark); }
 
-    .result-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-      gap: 8px;
+    /* MODALS & OVERLAYS */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; opacity: 0; visibility: hidden; transition: var(--transition);
     }
-
-    .result-question {
-      border-bottom: 1px solid #eee;
-      padding: 10px 0 12px;
-      font-size: 14px;
+    .modal-overlay.show { opacity: 1; visibility: visible; }
+    
+    .modal-card {
+      background: #fff; border-radius: 24px;
+      width: 90%; max-width: 800px; max-height: 90vh;
+      overflow-y: auto; padding: 40px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      transform: translateY(20px); transition: var(--transition);
     }
+    .modal-overlay.show .modal-card { transform: translateY(0); }
 
-    .result-question:last-child {
-      border-bottom: none;
-    }
+    .modal-card h2 { font-size: 26px; font-weight: 800; color: var(--primary-dark); margin-bottom: 12px; }
+    .modal-card p.subtitle { color: var(--text-muted); font-size: 15px; margin-bottom: 30px; line-height: 1.6; }
 
-    .result-options {
-      margin: 6px 0 6px 18px;
-    }
+    /* System Check Wizard */
+    .sys-check-container { display: flex; gap: 30px; margin-bottom: 30px; }
+    .sys-step { flex: 1; background: #f8fafc; border-radius: 16px; padding: 24px; border: 1px solid #e2e8f0; text-align: center; }
+    .sys-icon { width: 60px; height: 60px; background: #e0e7ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 24px; color: var(--primary); }
+    .sys-step h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .sys-step p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; min-height: 40px; }
+    .sys-video-container { width: 100%; height: 140px; background: #0f172a; border-radius: 12px; margin-bottom: 20px; overflow: hidden; position: relative; }
+    .sys-video-container video { width: 100%; height: 100%; object-fit: cover; }
+    .sys-video-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 12px; }
+    
+    .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #f1f5f9; color: #64748b; }
+    .status-badge.success { background: #dcfce7; color: #166534; }
+    .status-badge.success::before { content: '✓'; }
 
-    .result-options li {
-      margin-bottom: 2px;
-    }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid #e2e8f0; padding-top: 24px; }
 
-    .badge {
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 600;
-    }
+    /* RESULT MODAL SPECIFIC */
+    .result-score-wrap { display: flex; align-items: center; justify-content: center; gap: 40px; margin-bottom: 40px; }
+    .score-ring { width: 180px; height: 180px; border-radius: 50%; background: conic-gradient(var(--secondary) var(--p), #e2e8f0 0); display: flex; align-items: center; justify-content: center; position: relative; }
+    .score-ring::before { content: ""; position: absolute; inset: 12px; background: #fff; border-radius: 50%; }
+    .score-value { position: relative; z-index: 1; text-align: center; }
+    .score-value h1 { font-size: 48px; color: var(--text-main); line-height: 1; margin-bottom: 4px; }
+    .score-value span { font-size: 14px; color: var(--text-muted); font-weight: 600; }
+    .score-stats { display: flex; flex-direction: column; gap: 16px; }
+    .stat-row { display: flex; align-items: center; gap: 12px; font-size: 16px; font-weight: 600; }
+    .stat-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-g { background: var(--secondary); }
+    .dot-r { background: var(--danger); }
+    .dot-gray { background: #94a3b8; }
 
-    .badge.correct {
-      background: #c8e6c9;
-      color: #1b5e20;
-    }
-
-    .badge.wrong {
-      background: #ffcdd2;
-      color: #b71c1c;
-    }
-
-    .badge.empty {
-      background: #eeeeee;
-      color: #555;
-    }
-
-    .answer-highlight {
-      font-weight: 600;
-    }
-
-    /* ---- RINGKASAN SKOR & GRAFIK ---- */
-
-    .summary-top {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 18px;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .score-circle {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      border: 8px solid var(--green);
-      background: var(--green-light);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin: 6px 0;
-    }
-
-    .score-main {
-      font-size: 40px;
-      font-weight: 700;
-      color: var(--green);
-      line-height: 1;
-    }
-
-    .score-label {
-      font-size: 14px;
-      color: #2e7d32;
-      margin-top: 4px;
-    }
-
-    .score-sub {
-      font-size: 11px;
-      color: #4caf50;
-      margin-top: 2px;
-    }
-
-    .summary-counts {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      min-width: 230px;
-    }
-
-    .count-pill {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .count-pill.correct {
-      background: var(--green-light);
-      color: var(--green);
-    }
-
-    .count-pill.wrong {
-      background: var(--red-light);
-      color: var(--red);
-    }
-
-    .count-pill.empty {
-      background: var(--grey-light);
-      color: #455a64;
-    }
-
-    .count-pill span.value {
-      font-size: 16px;
-    }
-
-    .summary-note {
-      margin-top: 4px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .summary-subtitle {
-      margin-top: 16px;
-      margin-bottom: 4px;
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .summary-subdesc {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .summary-section-stats {
-      margin-top: 6px;
-    }
-
-    .section-bar-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 6px;
-      font-size: 13px;
-    }
-
-    .section-bar-label {
-      width: 150px;
-      font-weight: 500;
-    }
-
-    .section-bar-track {
-      flex: 1;
-      height: 10px;
-      border-radius: 999px;
-      background: #eef2ff;
-      overflow: hidden;
-    }
-
-    .section-bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      transition: width 0.5s ease;
-    }
-
-    .section-bar-value {
-      width: 100px;
-      text-align: right;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .summary-btn-row {
-      margin-top: 16px;
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .review-list { display: flex; flex-direction: column; gap: 16px; margin-top: 30px; }
+    .review-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; }
+    .review-item.correct { border-left: 4px solid var(--secondary); }
+    .review-item.wrong { border-left: 4px solid var(--danger); }
+    .review-item h4 { font-size: 15px; margin-bottom: 12px; }
+    .review-item p { font-size: 14px; margin-bottom: 8px; color: #475569; }
+    .review-item .exp { background: #fff; padding: 12px; border-radius: 8px; font-size: 13px; color: var(--primary-dark); font-weight: 500; margin-top: 12px; }
 
     @media (max-width: 900px) {
-      .cbt-main {
-        grid-template-columns: 1fr;
-      }
-      .cbt-question-panel {
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-      }
-    }
-
-    @media (max-width: 600px) {
-      .cbt-topbar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-      }
-
-      .topbar-right {
-        justify-content: space-between;
-      }
-
-      .question-title {
-        font-size: 18px;
-      }
-
-      .question-watermark {
-        font-size: 80px;
-        right: 10px;
-      }
-
-      .section-bar-label {
-        width: 110px;
-      }
+      .cbt-container { flex-direction: column; height: 100vh; max-width: 100%; border-radius: 0; }
+      .cbt-main { flex-direction: column; }
+      .cbt-sidebar { width: 100%; border-left: none; border-top: 1px solid rgba(0,0,0,0.05); padding: 16px; max-height: 250px; }
+      .sys-check-container { flex-direction: column; }
+      .topbar-left { display: none; /* Hide camera preview on small screens to save space */ }
     }
   </style>
 </head>
 <body>
-  <div class="cbt-container">
+  <div class="bg-shape shape-1"></div>
+  <div class="bg-shape shape-2"></div>
+
+  <div class="cbt-container glass-panel">
     <!-- TOP BAR -->
     <div class="cbt-topbar">
       <div class="topbar-left">
         <div class="preview-box">
-          Kamera
+          <div id="camPlaceholder">Memuat Kamera...</div>
+          <video id="topCamVideo" autoplay muted playsinline></video>
         </div>
-        <div class="preview-box small">
-          Screen Share
+        <div class="preview-box">
+          <div id="screenPlaceholder">Memuat Layar...</div>
+          <video id="topScreenVideo" autoplay muted playsinline></video>
         </div>
       </div>
       <div class="topbar-center">
-        <h1 class="header-title">Tes Potensial Akademik (TPA) <br>PT. Pertamina Hulu Rokan</h1>
+        <h1 class="header-title">Tes Potensial Akademik (TPA)</h1>
+        <div class="header-subtitle">PT. Pertamina Hulu Rokan - Computer Based Test</div>
       </div>
       <div class="topbar-right">
-        <div class="timer" id="timer">01 : 00 : 00</div>
-        <button class="btn-submit" id="submitBtn">
-          <span class="btn-submit-icon">!</span>
-          <span>Submit Ujian</span>
-        </button>
+        <div class="timer-badge" id="timerBadge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span id="timer">01:00:00</span>
+        </div>
+        <button class="btn btn-primary" id="submitBtn">Akhiri Ujian</button>
       </div>
     </div>
 
-    <!-- MAIN -->
+    <!-- MAIN APP -->
     <div class="cbt-main">
-      <!-- QUESTION PANEL -->
-      <div class="cbt-question-panel">
+      <div class="cbt-content">
         <div class="question-header">
-          <div class="question-title" id="questionTitle">Soal #1</div>
-          <div class="question-nav-buttons">
-            <button class="btn-nav" id="prevBtn">Sebelumnya</button>
-            <button class="btn-nav primary" id="nextBtn">Selanjutnya</button>
+          <div class="q-number-badge" id="qBadge">Soal 1</div>
+          <div class="question-nav">
+            <button class="btn btn-outline" id="prevBtn">Kembali</button>
+            <button class="btn btn-primary" id="nextBtn">Selanjutnya</button>
           </div>
         </div>
-
+        
         <div class="question-card">
-          <div class="question-text" id="questionText"></div>
-          <div class="options-list" id="optionsList">
-            <!-- opsi diisi via JS -->
-          </div>
-
-          <div class="question-watermark" id="watermark">01</div>
+          <div class="q-watermark" id="qWatermark">01</div>
+          <div class="q-text" id="qText">Memuat soal...</div>
+          <div class="options-list" id="optList"></div>
         </div>
       </div>
 
-      <!-- SIDEBAR -->
       <aside class="cbt-sidebar">
-        <div class="sidebar-title">Nomor Soal</div>
-        <div class="question-grid" id="questionGrid">
-          <!-- tombol nomor soal via JS -->
-        </div>
-
-        <div class="legend">
-          <div class="legend-item">
-            <div class="legend-color active"></div>
-            <span>Soal aktif</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color answered"></div>
-            <span>Sudah dijawab</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color unanswered"></div>
-            <span>Belum dijawab</span>
-          </div>
-        </div>
+        <h3 class="sidebar-title">Navigasi Soal</h3>
+        <div class="grid-container" id="qGrid"></div>
       </aside>
     </div>
   </div>
 
-  <!-- OVERLAY KETENTUAN UMUM -->
-  <div id="startOverlay" class="overlay">
-    <div class="start-card">
-      <h2>Ketentuan Umum Ujian TPA Online</h2>
-      <ol>
-        <li>Waktu pelaksanaan ujian adalah Waktu Indonesia Barat (WIB). Bagi Saudara/i yang berada di luar wilayah WIB, mohon menyesuaikan waktu.</li>
-        <li>Saudara/i <strong>WAJIB</strong> menggunakan perangkat Laptop/Komputer (tidak boleh menggunakan Smartphone).</li>
-        <li>Ujian hanya dapat dilaksanakan dengan menggunakan browser Google Chrome dan terhubung jaringan internet yang stabil.</li>
-        <li>
-          Spesifikasi minimum PC/Laptop:
-          <ul>
-            <li>Prosesor : Intel i3 atau setara</li>
-            <li>Memori : Minimal 4 GB</li>
-            <li>Memiliki webcam/camera</li>
-          </ul>
-        </li>
-        <li>Ujian akan membutuhkan akses webcam/camera dan share screen.</li>
-        <li>Saat ujian berlangsung, Saudara/i dilarang menutup browser pada Laptop/Komputer.</li>
-        <li>Saudara/i dapat melakukan login menggunakan email yang digunakan saat melakukan pendaftaran.</li>
-        <li>Saudara/i hanya dapat memulai ujian pada jadwal yang telah ditentukan, yaitu waktu mulai sampai dengan waktu berakhir.</li>
-        <li>Saudara/i wajib mempersiapkan perangkat ujian 15 (lima belas) menit sebelum waktu yang ditetapkan.</li>
-        <li>Materi Ujian terdiri dari materi numerik, penalaran, spasial, verbal dan bahasa Inggris, pengetahuan dasar Ms.Office dan Email berbentuk pilihan ganda dengan waktu pengerjaan <strong>60 menit</strong>.</li>
-        <li>Apabila waktu pelaksanaan ujian Anda sudah habis, maka secara otomatis ujian yang sedang Anda kerjakan akan tertutup.</li>
-        <li>Sistem penilaian tidak menggunakan sistem minus poin dan hanya jawaban yang benar yang akan dihitung poin.</li>
-      </ol>
-     <button id="startBtn" class="btn-start">
-        Saya telah membaca dan siap mengikuti ujian
-      </button>
-    </div>
-  </div>
-
-  <!-- OVERLAY RINGKASAN HASIL (DENGAN GRAFIK) -->
-  <div id="summaryOverlay" class="overlay hidden">
-    <div class="result-card">
-      <h2>Rekap Hasil Ujian TPA</h2>
-
-      <div class="summary-top">
-        <!-- SCORE BIG CIRCLE -->
-        <div class="score-circle">
-          <div class="score-main" id="summaryScore">0</div>
-          <div class="score-label">Skor</div>
-          <div class="score-sub">dari 100</div>
+  <!-- PRE-EXAM MODAL (System Check) -->
+  <div class="modal-overlay show" id="preExamModal">
+    <div class="modal-card">
+      <h2>Sistem Pengecekan Keamanan (Proctoring)</h2>
+      <p class="subtitle">Sesuai standar operasional ujian PT. Pertamina Hulu Rokan, sistem harus memastikan kamera dan layar Anda dapat direkam untuk mencegah kecurangan. Silakan berikan izin akses.</p>
+      
+      <div class="sys-check-container">
+        <div class="sys-step">
+          <div class="sys-icon">📷</div>
+          <h3>Akses Kamera</h3>
+          <p>Pastikan wajah Anda terlihat jelas dan pencahayaan ruangan cukup baik.</p>
+          <div class="sys-video-container">
+            <div class="sys-video-placeholder" id="camSetupPlaceholder">Kamera belum aktif</div>
+            <video id="setupCamVideo" autoplay muted playsinline></video>
+          </div>
+          <button class="btn btn-primary" id="reqCamBtn" style="width:100%; margin-bottom: 12px;">Izinkan Kamera</button>
+          <div class="status-badge" id="camStatus">Menunggu Izin...</div>
         </div>
-
-        <!-- COUNTS -->
-        <div class="summary-counts">
-          <div class="count-pill correct">
-            <span>Benar</span>
-            <span class="value" id="summaryCorrect">0</span>
+        
+        <div class="sys-step">
+          <div class="sys-icon">🖥️</div>
+          <h3>Akses Berbagi Layar</h3>
+          <p>Bagikan seluruh layar Anda (Entire Screen) selama ujian berlangsung.</p>
+          <div class="sys-video-container">
+            <div class="sys-video-placeholder" id="screenSetupPlaceholder">Layar belum aktif</div>
+            <video id="setupScreenVideo" autoplay muted playsinline></video>
           </div>
-          <div class="count-pill wrong">
-            <span>Salah</span>
-            <span class="value" id="summaryWrong">0</span>
-          </div>
-          <div class="count-pill empty">
-            <span>Kosong</span>
-            <span class="value" id="summaryEmpty">0</span>
-          </div>
+          <button class="btn btn-primary" id="reqScreenBtn" style="width:100%; margin-bottom: 12px;" disabled>Izinkan Layar</button>
+          <div class="status-badge" id="screenStatus">Menunggu Izin...</div>
         </div>
       </div>
-
-      <p class="summary-note" id="summaryNote"></p>
-
-      <h3 class="summary-subtitle">Kekuatan & Area Pengembangan</h3>
-      <p class="summary-subdesc">
-        Grafik berikut menunjukkan persentase jawaban benar pada setiap subtes. Semakin panjang bar, semakin kuat kemampuanmu pada area tersebut.
-      </p>
-
-      <div id="summarySectionStats" class="summary-section-stats">
-        <!-- diisi via JS -->
-      </div>
-
-      <div class="summary-btn-row">
-        <button id="reviewBtn" class="btn-nav primary">Review Soal</button>
-        <button id="summaryPrintBtn" class="btn-nav">Cetak</button>
-        <button id="summaryCloseBtn" class="btn-nav">Tutup</button>
+      
+      <div class="modal-footer">
+        <button class="btn btn-success" id="startExamBtn" disabled style="font-size: 16px; padding: 12px 30px;">Mulai Ujian Sekarang</button>
       </div>
     </div>
   </div>
 
-  <!-- OVERLAY HASIL & PEMBAHASAN DETAIL -->
-  <div id="resultOverlay" class="overlay hidden">
-    <div class="result-card">
-      <h2>Hasil &amp; Pembahasan Ujian TPA</h2>
-      <p><strong>Skor:</strong> <span id="resultScore">0 / 100</span></p>
-      <p id="resultSummary" style="margin-bottom:8px;font-size:14px;"></p>
-      <hr />
-      <div id="resultContent" style="margin-top:8px;"></div>
-      <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:8px;">
-        <button id="printResultBtn" class="btn-nav">Cetak</button>
-        <button id="closeResultBtn" class="btn-nav primary">Tutup</button>
+  <!-- RESULT MODAL -->
+  <div class="modal-overlay" id="resultModal">
+    <div class="modal-card">
+      <h2>Hasil Simulasi Ujian</h2>
+      <p class="subtitle">Ujian telah selesai. Berikut adalah ringkasan hasil pengerjaan Anda.</p>
+      
+      <div class="result-score-wrap">
+        <div class="score-ring" id="scoreRing" style="--p: 0%;">
+          <div class="score-value">
+            <h1 id="scoreTxt">0</h1>
+            <span>Nilai Akhir</span>
+          </div>
+        </div>
+        <div class="score-stats">
+          <div class="stat-row"><div class="stat-dot dot-g"></div> Benar: <span id="statCorrect">0</span></div>
+          <div class="stat-row"><div class="stat-dot dot-r"></div> Salah: <span id="statWrong">0</span></div>
+          <div class="stat-row"><div class="stat-dot dot-gray"></div> Kosong: <span id="statEmpty">0</span></div>
+        </div>
       </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="reviewExamBtn">Lihat Kunci & Pembahasan</button>
+        <button class="btn btn-primary" onclick="location.reload()">Selesai</button>
+      </div>
+
+      <div class="review-list" id="reviewList" style="display: none;"></div>
     </div>
   </div>
 
   <script>
-    /* ------------ DATA 100 SOAL (BARU) ------------ */
     const questions = [
   {
     "id": 1,
@@ -2094,416 +1712,249 @@
     "correctIndex": 4,
     "explanation": "Jika  menerima  email  yang  meminta  informasi  pribadi/rahasia  secara\nmencurigakan  (indikasi  phishing),  sebaiknya  tidak  memberikan  informasi  tersebut  dan\nmelaporkannya sebagai langkah pencegahan penipuan."
   }
-];
 
     const totalQuestions = questions.length;
     const answers = new Array(totalQuestions).fill(null);
     let currentIndex = 0;
+    
+    // UI Elements
+    const qBadge = document.getElementById('qBadge');
+    const qWatermark = document.getElementById('qWatermark');
+    const qText = document.getElementById('qText');
+    const optList = document.getElementById('optList');
+    const qGrid = document.getElementById('qGrid');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    
+    const choiceLetters = ['A', 'B', 'C', 'D', 'E'];
 
-    const questionTitle = document.getElementById("questionTitle");
-    const questionText = document.getElementById("questionText");
-    const optionsList = document.getElementById("optionsList");
-    const questionGrid = document.getElementById("questionGrid");
-    const watermark = document.getElementById("watermark");
-
-    const prevBtn = document.getElementById("prevBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const submitBtn = document.getElementById("submitBtn");
-
-    const startOverlay = document.getElementById("startOverlay");
-    const startBtn = document.getElementById("startBtn");
-
-    const summaryOverlay = document.getElementById("summaryOverlay");
-    const summaryScore = document.getElementById("summaryScore");
-    const summaryCorrect = document.getElementById("summaryCorrect");
-    const summaryWrong = document.getElementById("summaryWrong");
-    const summaryEmpty = document.getElementById("summaryEmpty");
-    const summaryNote = document.getElementById("summaryNote");
-    const summarySectionStats = document.getElementById("summarySectionStats");
-    const summaryPrintBtn = document.getElementById("summaryPrintBtn");
-    const summaryCloseBtn = document.getElementById("summaryCloseBtn");
-    const reviewBtn = document.getElementById("reviewBtn");
-
-    const resultOverlay = document.getElementById("resultOverlay");
-    const resultScore = document.getElementById("resultScore");
-    const resultSummary = document.getElementById("resultSummary");
-    const resultContent = document.getElementById("resultContent");
-    const printResultBtn = document.getElementById("printResultBtn");
-    const closeResultBtn = document.getElementById("closeResultBtn");
-
-    const timerEl = document.getElementById("timer");
-    let remainingSeconds = 60 * 60; // 60 menit
-    let timerInterval = null;
-
-    const choiceLetters = ["A", "B", "C", "D", "E"];
-
-    function renderQuestionNumbers() {
-      questionGrid.innerHTML = "";
+    function initGrid() {
+      qGrid.innerHTML = '';
       for (let i = 0; i < totalQuestions; i++) {
-        const btn = document.createElement("div");
-        btn.className = "question-number";
+        const btn = document.createElement('button');
+        btn.className = 'num-btn';
         btn.textContent = i + 1;
-        btn.dataset.index = i;
-        btn.addEventListener("click", () => {
-          goToQuestion(i);
-        });
-        questionGrid.appendChild(btn);
+        btn.onclick = () => goToQuestion(i);
+        qGrid.appendChild(btn);
       }
     }
 
-    function updateQuestionGridState() {
-      const nodes = questionGrid.querySelectorAll(".question-number");
-      nodes.forEach((node, i) => {
-        node.classList.remove("active");
-        node.classList.toggle("answered", answers[i] !== null);
-        if (i === currentIndex) node.classList.add("active");
-      });
+    function updateGrid() {
+      const btns = qGrid.children;
+      for (let i = 0; i < totalQuestions; i++) {
+        btns[i].className = 'num-btn';
+        if (answers[i] !== null) btns[i].classList.add('answered');
+        if (i === currentIndex) btns[i].classList.add('active');
+      }
     }
 
     function renderQuestion() {
       const q = questions[currentIndex];
-
-      questionTitle.textContent = "Soal #" + q.id;
-      questionText.textContent = q.text;
-      watermark.textContent = q.id.toString().padStart(2, "0");
-
-      optionsList.innerHTML = "";
+      qBadge.textContent = 'Soal ' + q.id;
+      qWatermark.textContent = q.id.toString().padStart(2, '0');
+      qText.innerHTML = q.text.replace(/\n/g, '<br/>');
+      
+      optList.innerHTML = '';
       q.options.forEach((opt, idx) => {
-        const optionId = `q${q.id}_opt${idx}`;
-        const wrapper = document.createElement("label");
-        wrapper.className = "option-item";
-
-        const input = document.createElement("input");
-        input.type = "radio";
-        input.name = "q" + q.id;
-        input.id = optionId;
+        const label = document.createElement('label');
+        label.className = 'option-label';
+        if (answers[currentIndex] === idx) label.classList.add('selected');
+        
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'q' + q.id;
         input.value = idx;
         if (answers[currentIndex] === idx) input.checked = true;
-
-        input.addEventListener("change", () => {
+        
+        input.onchange = () => {
           answers[currentIndex] = idx;
-          updateQuestionGridState();
-        });
+          renderQuestion();
+        };
 
-        const span = document.createElement("span");
-        span.className = "option-label";
-        span.textContent = choiceLetters[idx] + ". " + opt;
+        const letter = document.createElement('div');
+        letter.className = 'opt-letter';
+        letter.textContent = choiceLetters[idx];
 
-        wrapper.appendChild(input);
-        wrapper.appendChild(span);
-        optionsList.appendChild(wrapper);
+        const txt = document.createElement('div');
+        txt.className = 'opt-text';
+        txt.innerHTML = opt.replace(/\n/g, '<br/>');
+
+        label.append(input, letter, txt);
+        optList.appendChild(label);
       });
 
       prevBtn.disabled = currentIndex === 0;
-      nextBtn.disabled = currentIndex === totalQuestions - 1;
-
-      updateQuestionGridState();
+      if (currentIndex === totalQuestions - 1) {
+        nextBtn.textContent = "Selesai";
+      } else {
+        nextBtn.textContent = "Selanjutnya";
+      }
+      
+      updateGrid();
     }
 
-    function goToQuestion(index) {
-      currentIndex = index;
+    function goToQuestion(idx) {
+      currentIndex = idx;
       renderQuestion();
     }
 
-    prevBtn.addEventListener("click", () => {
-      if (currentIndex > 0) {
-        currentIndex--;
-        renderQuestion();
-      }
-    });
-
-    nextBtn.addEventListener("click", () => {
+    prevBtn.onclick = () => { if (currentIndex > 0) goToQuestion(currentIndex - 1); };
+    nextBtn.onclick = () => { 
       if (currentIndex < totalQuestions - 1) {
-        currentIndex++;
-        renderQuestion();
-      }
-    });
-
-    /* ------------ TIMER ------------ */
-    function formatTime(sec) {
-      const h = Math.floor(sec / 3600);
-      const m = Math.floor((sec % 3600) / 60);
-      const s = sec % 60;
-      const hh = String(h).padStart(2, "0");
-      const mm = String(m).padStart(2, "0");
-      const ss = String(s).padStart(2, "0");
-      return `${hh} : ${mm} : ${ss}`;
-    }
-
-    function updateTimerDisplay() {
-      timerEl.textContent = formatTime(remainingSeconds);
-    }
-
-    function tick() {
-      remainingSeconds--;
-      if (remainingSeconds <= 0) {
-        remainingSeconds = 0;
-        updateTimerDisplay();
-        if (timerInterval) {
-          clearInterval(timerInterval);
-          timerInterval = null;
-        }
-        alert("Waktu ujian telah habis. Rekap hasil dan pembahasan akan ditampilkan.");
-        showResults(true);
+        goToQuestion(currentIndex + 1);
       } else {
-        updateTimerDisplay();
+        finishExam();
       }
-    }
+    };
+
+    // TIMER
+    let timeRemaining = 60 * 60; // 60 minutes
+    const timerEl = document.getElementById('timer');
+    const timerBadge = document.getElementById('timerBadge');
+    let timerInt;
 
     function startTimer() {
-      if (timerInterval) return;
-      updateTimerDisplay();
-      timerInterval = setInterval(tick, 1000);
-    }
-
-    /* ------------ PERHITUNGAN & GRAFIK ------------ */
-
-    const sectionDefs = [{
-        name: "Numerik",
-        startId: 1,
-        endId: 20
-      },
-      {
-        name: "Penalaran",
-        startId: 21,
-        endId: 40
-      },
-      {
-        name: "Spasial",
-        startId: 41,
-        endId: 60
-      },
-      {
-        name: "Verbal & Inggris",
-        startId: 61,
-        endId: 80
-      },
-      {
-        name: "Ms Office & Email",
-        startId: 81,
-        endId: 100
-      }
-    ];
-
-    const barColors = ["#42a5f5", "#66bb6a", "#ffca28", "#ab47bc", "#ef5350"];
-
-    function computeSectionStats() {
-      const stats = sectionDefs.map(sec => ({
-        name: sec.name,
-        total: sec.endId - sec.startId + 1,
-        correct: 0
-      }));
-
-      questions.forEach((q, qIdx) => {
-        const ans = answers[qIdx];
-        const isCorrect = ans !== null && ans === q.correctIndex;
-        if (!isCorrect) return;
-
-        const secIndex = sectionDefs.findIndex(
-          sec => q.id >= sec.startId && q.id <= sec.endId
-        );
-        if (secIndex >= 0) {
-          stats[secIndex].correct++;
+      timerInt = setInterval(() => {
+        timeRemaining--;
+        if(timeRemaining <= 300) timerBadge.classList.add('danger'); // 5 mins left
+        
+        const h = Math.floor(timeRemaining / 3600).toString().padStart(2, '0');
+        const m = Math.floor((timeRemaining % 3600) / 60).toString().padStart(2, '0');
+        const s = (timeRemaining % 60).toString().padStart(2, '0');
+        timerEl.textContent = `${h}:${m}:${s}`;
+        
+        if (timeRemaining <= 0) {
+          clearInterval(timerInt);
+          finishExam();
         }
-      });
-
-      return stats;
+      }, 1000);
     }
 
-    function renderSectionBars(stats) {
-      summarySectionStats.innerHTML = "";
-      stats.forEach((sec, idx) => {
-        const row = document.createElement("div");
-        row.className = "section-bar-row";
+    // WEBRTC & PRE-EXAM
+    let camStream = null;
+    let screenStream = null;
+    
+    const reqCamBtn = document.getElementById('reqCamBtn');
+    const reqScreenBtn = document.getElementById('reqScreenBtn');
+    const startExamBtn = document.getElementById('startExamBtn');
+    
+    const setupCamVideo = document.getElementById('setupCamVideo');
+    const setupScreenVideo = document.getElementById('setupScreenVideo');
+    const topCamVideo = document.getElementById('topCamVideo');
+    const topScreenVideo = document.getElementById('topScreenVideo');
 
-        const label = document.createElement("div");
-        label.className = "section-bar-label";
-        label.textContent = sec.name;
-
-        const track = document.createElement("div");
-        track.className = "section-bar-track";
-
-        const fill = document.createElement("div");
-        fill.className = "section-bar-fill";
-        const pct = sec.total > 0 ? Math.round((sec.correct / sec.total) * 100) : 0;
-        fill.style.width = pct + "%";
-        fill.style.background = barColors[idx % barColors.length];
-
-        track.appendChild(fill);
-
-        const value = document.createElement("div");
-        value.className = "section-bar-value";
-        value.textContent = `${sec.correct}/${sec.total} (${pct}%)`;
-
-        row.appendChild(label);
-        row.appendChild(track);
-        row.appendChild(value);
-
-        summarySectionStats.appendChild(row);
-      });
-    }
-
-    /* ------------ HASIL & PEMBAHASAN ------------ */
-    function showResults(autoSubmit = false) {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
+    reqCamBtn.onclick = async () => {
+      reqCamBtn.textContent = "Meminta Izin...";
+      try {
+        camStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        setupCamVideo.srcObject = camStream;
+        topCamVideo.srcObject = camStream;
+        setupCamVideo.style.display = 'block';
+        
+        document.getElementById('camSetupPlaceholder').style.display = 'none';
+        document.getElementById('camStatus').className = 'status-badge success';
+        document.getElementById('camStatus').textContent = 'Kamera Aktif';
+        reqCamBtn.style.display = 'none';
+        
+        // Enable next step
+        reqScreenBtn.disabled = false;
+      } catch (err) {
+        alert("Gagal mengakses kamera. Pastikan memberikan izin pada browser Anda.");
+        reqCamBtn.textContent = "Coba Lagi";
       }
+    };
 
-      let correct = 0;
-      let wrong = 0;
-      let empty = 0;
+    reqScreenBtn.onclick = async () => {
+      reqScreenBtn.textContent = "Meminta Izin...";
+      try {
+        screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        setupScreenVideo.srcObject = screenStream;
+        topScreenVideo.srcObject = screenStream;
+        setupScreenVideo.style.display = 'block';
+        
+        document.getElementById('screenSetupPlaceholder').style.display = 'none';
+        document.getElementById('screenStatus').className = 'status-badge success';
+        document.getElementById('screenStatus').textContent = 'Layar Terekam';
+        reqScreenBtn.style.display = 'none';
+        
+        // Enable Start Exam
+        startExamBtn.disabled = false;
+      } catch (err) {
+        alert("Gagal membagikan layar. Harus Entire Screen / Seluruh Layar.");
+        reqScreenBtn.textContent = "Coba Lagi";
+      }
+    };
 
-      questions.forEach((q, idx) => {
-        const ans = answers[idx];
-        if (ans === null) {
-          empty++;
-        } else if (ans === q.correctIndex) {
-          correct++;
-        } else {
-          wrong++;
-        }
+    startExamBtn.onclick = () => {
+      document.getElementById('preExamModal').classList.remove('show');
+      
+      // Move streams to topbar
+      if(camStream) { topCamVideo.style.display = 'block'; document.getElementById('camPlaceholder').style.display = 'none'; }
+      if(screenStream) { topScreenVideo.style.display = 'block'; document.getElementById('screenPlaceholder').style.display = 'none'; }
+      
+      initGrid();
+      renderQuestion();
+      startTimer();
+    };
+
+    // FINISH EXAM
+    document.getElementById('submitBtn').onclick = () => {
+      if(confirm("Apakah Anda yakin ingin mengakhiri ujian sekarang?")) finishExam();
+    };
+
+    function finishExam() {
+      clearInterval(timerInt);
+      
+      // Stop streams
+      if(camStream) camStream.getTracks().forEach(t => t.stop());
+      if(screenStream) screenStream.getTracks().forEach(t => t.stop());
+
+      let correct = 0, wrong = 0, empty = 0;
+      answers.forEach((ans, i) => {
+        if (ans === null) empty++;
+        else if (ans === questions[i].correctIndex) correct++;
+        else wrong++;
       });
 
       const score = Math.round((correct / totalQuestions) * 100);
-
-      // --- RINGKASAN (SKOR & GRAFIK) ---
-      summaryScore.textContent = `${score}`;
-      summaryCorrect.textContent = correct;
-      summaryWrong.textContent = wrong;
-      summaryEmpty.textContent = empty;
-      summaryNote.textContent = autoSubmit ?
-        "Ujian berakhir karena waktu habis." :
-        "Ujian telah disubmit.";
-
-      const sectionStats = computeSectionStats();
-      renderSectionBars(sectionStats);
-
-      // --- DETAIL (REVIEW SOAL) ---
-      resultScore.textContent = `${correct} / ${totalQuestions}`;
-      resultSummary.textContent =
-        `Benar: ${correct}, Salah: ${wrong}, Kosong: ${empty}.` +
-        (autoSubmit ? " (Ujian berakhir karena waktu habis)" : "");
-
-      resultContent.innerHTML = "";
-      questions.forEach((q, idx) => {
-        const userAns = answers[idx];
-        const isEmpty = userAns === null;
-        const isCorrect = !isEmpty && userAns === q.correctIndex;
-
-        const div = document.createElement("div");
-        div.className = "result-question";
-
-        const header = document.createElement("div");
-        header.className = "result-header";
-
-        const title = document.createElement("strong");
-        title.textContent = `Soal #${q.id}`;
-
-        const badge = document.createElement("span");
-        badge.classList.add("badge");
-        if (isEmpty) {
-          badge.classList.add("empty");
-          badge.textContent = "Kosong";
-        } else if (isCorrect) {
-          badge.classList.add("correct");
-          badge.textContent = "Benar";
-        } else {
-          badge.classList.add("wrong");
-          badge.textContent = "Salah";
-        }
-
-        header.appendChild(title);
-        header.appendChild(badge);
-
-        const textP = document.createElement("p");
-        textP.textContent = q.text;
-
-        const ul = document.createElement("ul");
-        ul.className = "result-options";
-        q.options.forEach((opt, oIdx) => {
-          const li = document.createElement("li");
-          let label = `${choiceLetters[oIdx]}. ${opt}`;
-          if (oIdx === q.correctIndex) {
-            label += " (kunci)";
-            li.classList.add("answer-highlight");
-          }
-          li.textContent = label;
-          ul.appendChild(li);
-        });
-
-        const yourAnsP = document.createElement("p");
-        const yourLabel = isEmpty ?
-          "Kosong" :
-          `${choiceLetters[userAns]}. ${q.options[userAns]}`;
-        yourAnsP.innerHTML = `<strong>Jawaban Anda:</strong> ${yourLabel}`;
-
-        const correctAnsP = document.createElement("p");
-        correctAnsP.innerHTML = `<strong>Jawaban Benar:</strong> ${choiceLetters[q.correctIndex]}. ${q.options[q.correctIndex]}`;
-
-        const expP = document.createElement("p");
-        // Ganti newline jadi <br> agar tampil rapi di HTML
-        const cleanExplanation = q.explanation.replace(/\n/g, "<br>");
-        expP.innerHTML = `<strong>Penjelasan:</strong> ${cleanExplanation}`;
-
-        div.appendChild(header);
-        div.appendChild(textP);
-        div.appendChild(ul);
-        div.appendChild(yourAnsP);
-        div.appendChild(correctAnsP);
-        div.appendChild(expP);
-
-        resultContent.appendChild(div);
-      });
-
-      // tampilkan ringkasan
-      summaryOverlay.classList.remove("hidden");
+      
+      document.getElementById('resultModal').classList.add('show');
+      document.getElementById('scoreRing').style.setProperty('--p', `${score}%`);
+      document.getElementById('scoreTxt').textContent = score;
+      document.getElementById('statCorrect').textContent = correct;
+      document.getElementById('statWrong').textContent = wrong;
+      document.getElementById('statEmpty').textContent = empty;
     }
 
-    submitBtn.addEventListener("click", () => {
-      const confirmSubmit = confirm(
-        "Apakah kamu yakin ingin mengakhiri ujian?"
-      );
-      if (!confirmSubmit) return;
-      showResults(false);
-    });
-
-    // tombol di ringkasan
-    reviewBtn.addEventListener("click", () => {
-      summaryOverlay.classList.add("hidden");
-      resultOverlay.classList.remove("hidden");
-    });
-
-    summaryPrintBtn.addEventListener("click", () => {
-      window.print();
-    });
-
-    summaryCloseBtn.addEventListener("click", () => {
-      summaryOverlay.classList.add("hidden");
-    });
-
-    // tombol di overlay detail
-    printResultBtn.addEventListener("click", () => {
-      window.print();
-    });
-
-    closeResultBtn.addEventListener("click", () => {
-      resultOverlay.classList.add("hidden");
-    });
-
-    /* ------------ START OVERLAY ------------ */
-    startBtn.addEventListener("click", () => {
-      startOverlay.classList.add("hidden");
-      startTimer();
-    });
-
-    /* INIT */
-    updateTimerDisplay();
-    renderQuestionNumbers();
-    renderQuestion();
-
-  </script>
-
+    // REVIEW
+    document.getElementById('reviewExamBtn').onclick = () => {
+      const list = document.getElementById('reviewList');
+      list.style.display = 'flex';
+      list.innerHTML = '';
+      
+      questions.forEach((q, i) => {
+        const item = document.createElement('div');
+        const ans = answers[i];
+        const isCorrect = ans === q.correctIndex;
+        item.className = 'review-item ' + (isCorrect ? 'correct' : 'wrong');
+        
+        let html = `<h4>Soal ${q.id}</h4><p>${q.text}</p>`;
+        
+        const ansTxt = ans !== null ? `${choiceLetters[ans]}. ${q.options[ans]}` : "Tidak dijawab";
+        const corTxt = `${choiceLetters[q.correctIndex]}. ${q.options[q.correctIndex]}`;
+        
+        html += `<p><strong>Jawaban Anda:</strong> ${ansTxt}</p>`;
+        if (!isCorrect) {
+          html += `<p><strong>Kunci Jawaban:</strong> ${corTxt}</p>`;
+        }
+        
+        html += `<div class="exp"><strong>Pembahasan:</strong><br/>${q.explanation}</div>`;
+        item.innerHTML = html;
+        list.appendChild(item);
+      });
+      
+      document.getElementById('reviewExamBtn').style.display = 'none';
+    };
   </script>
 </body>
 </html>
