@@ -1,0 +1,2509 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simulasi CBT TPA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --primary: #007bff;
+      --primary-dark: #0056b3;
+      --bg: #f5f9ff;
+      --border: #d9e2f3;
+      --text: #333;
+      --muted: #777;
+      --danger: #e53935;
+
+      --green: #43a047;
+      --green-light: #e8f5e9;
+      --red: #e53935;
+      --red-light: #ffebee;
+      --grey-light: #eceff1;
+      --blue-soft: #e3f2fd;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    body {
+      background: #e5edf8;
+      color: var(--text);
+    }
+
+    .cbt-container {
+      max-width: 1200px;
+      margin: 20px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 80vh;
+    }
+
+    /* TOP BAR */
+    .topbar-center {
+      flex: 1;
+      text-align: center;
+      padding: 0 15px;
+    }
+
+    .header-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin: 0;
+      letter-spacing: 0.5px;
+    }
+    
+    @media (max-width: 768px) {
+      .header-title {
+        font-size: 18px;
+      }
+    }
+
+    .cbt-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      background: #f3f6fb;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-left {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .preview-box {
+      width: 150px;
+      height: 80px;
+      background: #fff;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--muted);
+      overflow: hidden;
+    }
+
+    .preview-box.small {
+      width: 150px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .timer {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .btn-submit {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 18px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .btn-submit:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-submit-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+    }
+
+    /* MAIN LAYOUT */
+
+    .cbt-main {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      min-height: 0;
+      flex: 1;
+    }
+
+    .cbt-question-panel {
+      padding: 20px 24px;
+      border-right: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .cbt-sidebar {
+      padding: 20px 20px;
+      background: #fff;
+    }
+
+    /* QUESTION HEADER */
+
+    .question-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .question-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    .question-nav-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-nav {
+      min-width: 110px;
+      padding: 8px 14px;
+      border-radius: 4px;
+      border: 1px solid var(--primary);
+      background: #fff;
+      color: var(--primary-dark);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .btn-nav.primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    /* QUESTION CARD */
+
+    .question-card {
+      position: relative;
+      background: #fafdff;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 18px 20px 24px;
+      min-height: 340px;
+      overflow: hidden;
+    }
+
+    .question-watermark {
+      position: absolute;
+      right: 30px;
+      bottom: 10px;
+      font-size: 120px;
+      font-weight: 700;
+      color: rgba(200, 220, 250, 0.75);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .question-text {
+      margin-bottom: 18px;
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--text);
+      max-width: 90%;
+    }
+
+    .options-list {
+      margin-top: 6px;
+    }
+
+    .option-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .option-item input[type="radio"] {
+      margin-top: 3px;
+      cursor: pointer;
+    }
+
+    .option-label {
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    /* SIDEBAR */
+
+    .sidebar-title {
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .question-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      background: #f6f8fc;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .question-number.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary-dark);
+    }
+
+    .question-number.answered {
+      background: #c8e6c9;
+      border-color: #66bb6a;
+      color: #1b5e20;
+    }
+
+    .legend {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+    }
+
+    .legend-color.active {
+      background: var(--primary);
+      border-color: var(--primary-dark);
+    }
+
+    .legend-color.answered {
+      background: #c8e6c9;
+      border-color: #66bb6a;
+    }
+
+    .legend-color.unanswered {
+      background: #f6f8fc;
+    }
+
+    /* OVERLAY (ketentuan & hasil) */
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .overlay.hidden {
+      display: none;
+    }
+
+    .start-card,
+    .result-card {
+      background: #fff;
+      border-radius: 10px;
+      max-width: 960px;
+      width: 92%;
+      max-height: 90vh;
+      padding: 24px 26px;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .start-card h2,
+    .result-card h2 {
+      margin-bottom: 12px;
+    }
+
+    .start-card ol {
+      margin-left: 18px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .start-card li + li {
+      margin-top: 4px;
+    }
+
+    .start-card ul {
+      margin-left: 18px;
+      margin-top: 4px;
+    }
+
+    .btn-start {
+      margin-top: 10px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .btn-start:hover {
+      background: var(--primary-dark);
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 8px;
+    }
+
+    .result-question {
+      border-bottom: 1px solid #eee;
+      padding: 10px 0 12px;
+      font-size: 14px;
+    }
+
+    .result-question:last-child {
+      border-bottom: none;
+    }
+
+    .result-options {
+      margin: 6px 0 6px 18px;
+    }
+
+    .result-options li {
+      margin-bottom: 2px;
+    }
+
+    .badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge.correct {
+      background: #c8e6c9;
+      color: #1b5e20;
+    }
+
+    .badge.wrong {
+      background: #ffcdd2;
+      color: #b71c1c;
+    }
+
+    .badge.empty {
+      background: #eeeeee;
+      color: #555;
+    }
+
+    .answer-highlight {
+      font-weight: 600;
+    }
+
+    /* ---- RINGKASAN SKOR & GRAFIK ---- */
+
+    .summary-top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .score-circle {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 8px solid var(--green);
+      background: var(--green-light);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 6px 0;
+    }
+
+    .score-main {
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--green);
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 14px;
+      color: #2e7d32;
+      margin-top: 4px;
+    }
+
+    .score-sub {
+      font-size: 11px;
+      color: #4caf50;
+      margin-top: 2px;
+    }
+
+    .summary-counts {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 230px;
+    }
+
+    .count-pill {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .count-pill.correct {
+      background: var(--green-light);
+      color: var(--green);
+    }
+
+    .count-pill.wrong {
+      background: var(--red-light);
+      color: var(--red);
+    }
+
+    .count-pill.empty {
+      background: var(--grey-light);
+      color: #455a64;
+    }
+
+    .count-pill span.value {
+      font-size: 16px;
+    }
+
+    .summary-note {
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .summary-subtitle {
+      margin-top: 16px;
+      margin-bottom: 4px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .summary-subdesc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .summary-section-stats {
+      margin-top: 6px;
+    }
+
+    .section-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .section-bar-label {
+      width: 150px;
+      font-weight: 500;
+    }
+
+    .section-bar-track {
+      flex: 1;
+      height: 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      overflow: hidden;
+    }
+
+    .section-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.5s ease;
+    }
+
+    .section-bar-value {
+      width: 100px;
+      text-align: right;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .summary-btn-row {
+      margin-top: 16px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 900px) {
+      .cbt-main {
+        grid-template-columns: 1fr;
+      }
+      .cbt-question-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .cbt-topbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      .topbar-right {
+        justify-content: space-between;
+      }
+
+      .question-title {
+        font-size: 18px;
+      }
+
+      .question-watermark {
+        font-size: 80px;
+        right: 10px;
+      }
+
+      .section-bar-label {
+        width: 110px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cbt-container">
+    <!-- TOP BAR -->
+    <div class="cbt-topbar">
+      <div class="topbar-left">
+        <div class="preview-box">
+          Kamera
+        </div>
+        <div class="preview-box small">
+          Screen Share
+        </div>
+      </div>
+      <div class="topbar-center">
+        <h1 class="header-title">Tes Potensial Akademik (TPA) <br>PT. Pertamina Hulu Rokan</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="timer" id="timer">01 : 00 : 00</div>
+        <button class="btn-submit" id="submitBtn">
+          <span class="btn-submit-icon">!</span>
+          <span>Submit Ujian</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="cbt-main">
+      <!-- QUESTION PANEL -->
+      <div class="cbt-question-panel">
+        <div class="question-header">
+          <div class="question-title" id="questionTitle">Soal #1</div>
+          <div class="question-nav-buttons">
+            <button class="btn-nav" id="prevBtn">Sebelumnya</button>
+            <button class="btn-nav primary" id="nextBtn">Selanjutnya</button>
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="question-text" id="questionText"></div>
+          <div class="options-list" id="optionsList">
+            <!-- opsi diisi via JS -->
+          </div>
+
+          <div class="question-watermark" id="watermark">01</div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR -->
+      <aside class="cbt-sidebar">
+        <div class="sidebar-title">Nomor Soal</div>
+        <div class="question-grid" id="questionGrid">
+          <!-- tombol nomor soal via JS -->
+        </div>
+
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-color active"></div>
+            <span>Soal aktif</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color answered"></div>
+            <span>Sudah dijawab</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color unanswered"></div>
+            <span>Belum dijawab</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- OVERLAY KETENTUAN UMUM -->
+  <div id="startOverlay" class="overlay">
+    <div class="start-card">
+      <h2>Ketentuan Umum Ujian TPA Online</h2>
+      <ol>
+        <li>Waktu pelaksanaan ujian adalah Waktu Indonesia Barat (WIB). Bagi Saudara/i yang berada di luar wilayah WIB, mohon menyesuaikan waktu.</li>
+        <li>Saudara/i <strong>WAJIB</strong> menggunakan perangkat Laptop/Komputer (tidak boleh menggunakan Smartphone).</li>
+        <li>Ujian hanya dapat dilaksanakan dengan menggunakan browser Google Chrome dan terhubung jaringan internet yang stabil.</li>
+        <li>
+          Spesifikasi minimum PC/Laptop:
+          <ul>
+            <li>Prosesor : Intel i3 atau setara</li>
+            <li>Memori : Minimal 4 GB</li>
+            <li>Memiliki webcam/camera</li>
+          </ul>
+        </li>
+        <li>Ujian akan membutuhkan akses webcam/camera dan share screen.</li>
+        <li>Saat ujian berlangsung, Saudara/i dilarang menutup browser pada Laptop/Komputer.</li>
+        <li>Saudara/i dapat melakukan login menggunakan email yang digunakan saat melakukan pendaftaran.</li>
+        <li>Saudara/i hanya dapat memulai ujian pada jadwal yang telah ditentukan, yaitu waktu mulai sampai dengan waktu berakhir.</li>
+        <li>Saudara/i wajib mempersiapkan perangkat ujian 15 (lima belas) menit sebelum waktu yang ditetapkan.</li>
+        <li>Materi Ujian terdiri dari materi numerik, penalaran, spasial, verbal dan bahasa Inggris, pengetahuan dasar Ms.Office dan Email berbentuk pilihan ganda dengan waktu pengerjaan <strong>60 menit</strong>.</li>
+        <li>Apabila waktu pelaksanaan ujian Anda sudah habis, maka secara otomatis ujian yang sedang Anda kerjakan akan tertutup.</li>
+        <li>Sistem penilaian tidak menggunakan sistem minus poin dan hanya jawaban yang benar yang akan dihitung poin.</li>
+      </ol>
+     <button id="startBtn" class="btn-start">
+        Saya telah membaca dan siap mengikuti ujian
+      </button>
+    </div>
+  </div>
+
+  <!-- OVERLAY RINGKASAN HASIL (DENGAN GRAFIK) -->
+  <div id="summaryOverlay" class="overlay hidden">
+    <div class="result-card">
+      <h2>Rekap Hasil Ujian TPA</h2>
+
+      <div class="summary-top">
+        <!-- SCORE BIG CIRCLE -->
+        <div class="score-circle">
+          <div class="score-main" id="summaryScore">0</div>
+          <div class="score-label">Skor</div>
+          <div class="score-sub">dari 100</div>
+        </div>
+
+        <!-- COUNTS -->
+        <div class="summary-counts">
+          <div class="count-pill correct">
+            <span>Benar</span>
+            <span class="value" id="summaryCorrect">0</span>
+          </div>
+          <div class="count-pill wrong">
+            <span>Salah</span>
+            <span class="value" id="summaryWrong">0</span>
+          </div>
+          <div class="count-pill empty">
+            <span>Kosong</span>
+            <span class="value" id="summaryEmpty">0</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="summary-note" id="summaryNote"></p>
+
+      <h3 class="summary-subtitle">Kekuatan & Area Pengembangan</h3>
+      <p class="summary-subdesc">
+        Grafik berikut menunjukkan persentase jawaban benar pada setiap subtes. Semakin panjang bar, semakin kuat kemampuanmu pada area tersebut.
+      </p>
+
+      <div id="summarySectionStats" class="summary-section-stats">
+        <!-- diisi via JS -->
+      </div>
+
+      <div class="summary-btn-row">
+        <button id="reviewBtn" class="btn-nav primary">Review Soal</button>
+        <button id="summaryPrintBtn" class="btn-nav">Cetak</button>
+        <button id="summaryCloseBtn" class="btn-nav">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERLAY HASIL & PEMBAHASAN DETAIL -->
+  <div id="resultOverlay" class="overlay hidden">
+    <div class="result-card">
+      <h2>Hasil &amp; Pembahasan Ujian TPA</h2>
+      <p><strong>Skor:</strong> <span id="resultScore">0 / 100</span></p>
+      <p id="resultSummary" style="margin-bottom:8px;font-size:14px;"></p>
+      <hr />
+      <div id="resultContent" style="margin-top:8px;"></div>
+      <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:8px;">
+        <button id="printResultBtn" class="btn-nav">Cetak</button>
+        <button id="closeResultBtn" class="btn-nav primary">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ------------ DATA 100 SOAL (BARU) ------------ */
+    const questions = [
+  {
+    "id": 1,
+    "text": "5, 7, 12, 19, 31, 50, 81, ...",
+    "options": [
+      "129",
+      "131",
+      "135",
+      "125",
+      "140"
+    ],
+    "correctIndex": 1,
+    "explanation": "Pola  deret  ini  adalah  penjumlahan  dua  suku  sebelumnya  (mirip  Fibonacci):\n5+7=12, 7+12=19, 12+19=31, 19+31=50, 31+50=81. Maka suku berikutnya = 50+81 = 131."
+  },
+  {
+    "id": 2,
+    "text": "... 34 35 39 40 44 45",
+    "options": [
+      "17",
+      "13",
+      "30",
+      "41",
+      "33"
+    ],
+    "correctIndex": 2,
+    "explanation": "Perhatikan pola berpasangan: naik 1, lalu naik 4, naik 1, naik 4, dan seterusnya:\n(34,35) → +4 → (39,40) → +4 → (44,45). Jika ditarik ke belakang, sebelum 34 seharusnya ada\npasangan (29, 30) karena 30 + 4 = 34. Jadi angka yang hilang adalah 30."
+  },
+  {
+    "id": 3,
+    "text": "10 30 32 16 48 50 ... ...",
+    "options": [
+      "18 dan 36",
+      "98 dan 60",
+      "58 dan 48",
+      "25 dan 75",
+      "32 dan 64"
+    ],
+    "correctIndex": 3,
+    "explanation": "Pola operasi berulang setiap 3 suku: ×3, +2, :2. 10×3=30, 30+2=32, 32:2=16,\n16×3=48, 48+2=50, 50:2=25, 25×3=75. Dua suku berikutnya adalah 25 dan 75."
+  },
+  {
+    "id": 4,
+    "text": "81, 27, 9, 3, ...",
+    "options": [
+      "1",
+      "2",
+      "0",
+      "6",
+      "9"
+    ],
+    "correctIndex": 0,
+    "explanation": "Setiap suku merupakan hasil bagi 3 dari suku sebelumnya: 81:3=27, 27:3=9,\n9:3=3, 3:3=1. Jawaban: 1."
+  },
+  {
+    "id": 5,
+    "text": "11 4 22 9 ... 14 44 19 55",
+    "options": [
+      "28",
+      "20",
+      "24",
+      "33",
+      "25"
+    ],
+    "correctIndex": 3,
+    "explanation": "Deret ini merupakan dua deret yang diselang-seling. Posisi ganjil (ke-1,3,5,7,9):\n11, 22, ?, 44, 55 — kelipatan 11 (11, 22, 33, 44, 55). Posisi genap (ke-2,4,6,8): 4, 9, 14, 19 —\nnaik 5 setiap suku. Maka bilangan yang hilang pada posisi ke-5 adalah 33."
+  },
+  {
+    "id": 6,
+    "text": "20, 18, 24, 22, 28, ..., ...",
+    "options": [
+      "26 dan 32",
+      "27 dan 30",
+      "24 dan 29",
+      "26 dan 30",
+      "25 dan 31"
+    ],
+    "correctIndex": 0,
+    "explanation": "Pola  berselang-seling:  −2,  +6,  −2,  +6,  ...  20−2=18,  18+6=24,  24−2=22,\n22+6=28, 28−2=26, 26+6=32. Dua suku berikutnya adalah 26 dan 32."
+  },
+  {
+    "id": 7,
+    "text": "2 5 10 17 26 ... ... (tertulis di soal sumber sebagai \"25101726 ...\")",
+    "options": [
+      "28 dan 17",
+      "19 dan 38",
+      "24 dan 81",
+      "23 dan 15",
+      "34 dan 42"
+    ],
+    "correctIndex": 0,
+    "explanation": "Jika dipisah per angka, deret ini membentuk 2, 5, 10, 17, 26 dengan selisih 3, 5,\n7, 9 (selisih naik 2 setiap kali) — pola klasik n² + 1 (1²+1=2, 2²+1=5, 3²+1=10, 4²+1=17,\n5²+1=26). Mengikuti pola ini, dua suku berikutnya seharusnya 26+11=37 dan 37+13=50.\nCatatan:  Catatan: dari kelima pilihan yang tersedia di dokumen sumber, tidak ada yang cocok dengan\nhasil 37 dan 50. Kemungkinan terjadi kesalahan ketik/transkripsi pada soal atau pilihan jawaban aslinya.\nInti pembahasan di atas adalah metode pengerjaannya (pola selisih ganjil berurutan / n² + 1), yang\ntetap berlaku untuk soal sejenis."
+  },
+  {
+    "id": 8,
+    "text": "2 4 6 9 11 13 ... ... (tertulis di soal sumber sebagai \"24691113 ....\")",
+    "options": [
+      "98",
+      "22 dan 26",
+      "18 dan 22",
+      "14 dan 17",
+      "16 dan 18"
+    ],
+    "correctIndex": 4,
+    "explanation": "Dipisah menjadi 2, 4, 6, 9, 11, 13 dengan pola selisih berulang setiap 3 suku: +2,\n+2, +3. Setelah 13, selisih berikutnya adalah +3 → 16, kemudian +2 → 18. Jawaban: 16 dan 18."
+  },
+  {
+    "id": 9,
+    "text": "11, 13, 17, 23, 31, ...",
+    "options": [
+      "37",
+      "41",
+      "43",
+      "39",
+      "47"
+    ],
+    "correctIndex": 1,
+    "explanation": "Selisih  antar  suku:  13−11=2,  17−13=4,  23−17=6,  31−23=8  (selisih  naik  2\nsetiap kali). Selisih berikutnya adalah 10, sehingga suku berikutnya = 31 + 10 = 41."
+  },
+  {
+    "id": 10,
+    "text": "Hasil dari 5! (5 faktorial) adalah ...",
+    "options": [
+      "5",
+      "15",
+      "20",
+      "60",
+      "120"
+    ],
+    "correctIndex": 4,
+    "explanation": "5! = 5 × 4 × 3 × 2 × 1 = 120."
+  },
+  {
+    "id": 11,
+    "text": "Rata-rata usia gabungan sekelompok guru (35 tahun) dan dosen (50\ntahun) adalah 40 tahun. Berapa perbandingan jumlah guru terhadap\njumlah dosen?",
+    "options": [
+      "1:2",
+      "2:1",
+      "2:3",
+      "3:2",
+      "3:1"
+    ],
+    "correctIndex": 1,
+    "explanation": "Misalkan jumlah guru = g dan jumlah dosen = d. (35g + 50d) / (g + d) = 40 →\n35g + 50d = 40g + 40d → 10d = 5g → g = 2d. Jadi perbandingan guru : dosen = 2 : 1."
+  },
+  {
+    "id": 12,
+    "text": "Jumlah semua bilangan ganjil antara 40 dan 60 adalah ...",
+    "options": [
+      "480",
+      "500",
+      "600",
+      "720",
+      "920"
+    ],
+    "correctIndex": 1,
+    "explanation": "Bilangan ganjil antara 40 dan 60: 41, 43, 45, 47, 49, 51, 53, 55, 57, 59 (10 suku).\nJumlah = (41 + 59) × 10 / 2 = 500."
+  },
+  {
+    "id": 13,
+    "text": "456pq − 32 = 424, maka 147pq + 53 = ...",
+    "options": [
+      "160",
+      "180",
+      "200",
+      "230",
+      "320"
+    ],
+    "correctIndex": 2,
+    "explanation": "Persamaan pertama membuktikan bahwa nilai numerik yang dimaksud adalah\n456, karena 456 − 32 = 424 (terbukti benar secara aritmetika biasa). Artinya tambahan \"pq\"\npada soal tidak mengubah nilai bilangan utama (kemungkinan hanya sisa format/penomoran\ndari sumber soal). Dengan logika perhitungan yang sama: 147 + 53 = 200."
+  },
+  {
+    "id": 14,
+    "text": "Sebuah barang dijual dengan harga Rp60.000, memperoleh laba 20%\ndari harga beli. Berapa harga beli barang tersebut?",
+    "options": [
+      "Rp72.000",
+      "Rp56.000",
+      "Rp50.000",
+      "Rp48.000",
+      "Rp30.000"
+    ],
+    "correctIndex": 2,
+    "explanation": "Harga Jual = Harga Beli + 20% × Harga Beli = 1,2 × HB. 60.000 = 1,2 × HB →\nHB = 60.000 / 1,2 = Rp50.000."
+  },
+  {
+    "id": 15,
+    "text": "Harga 3 pensil dan 2 buku adalah Rp13.000. Harga 2 pensil dan 4 buku\nadalah Rp16.000. Berapa harga 1 pensil?",
+    "options": [
+      "Rp1.000",
+      "Rp1.500",
+      "Rp2.000",
+      "Rp2.500",
+      "Rp3.000"
+    ],
+    "correctIndex": 3,
+    "explanation": "Misalkan harga pensil = p dan buku = b. 3p + 2b = 13.000 (kalikan 2) → 6p + 4b\n= 26.000. Kurangi dengan 2p + 4b = 16.000 → 4p = 10.000 → p = 2.500. Jadi harga 1 pensil =\nRp2.500."
+  },
+  {
+    "id": 16,
+    "text": "Suatu pekerjaan dapat diselesaikan oleh 6 orang dalam 15 hari. Jika\ningin diselesaikan dalam 10 hari, berapa orang tambahan yang\ndiperlukan?",
+    "options": [
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "correctIndex": 1,
+    "explanation": "T otal  pekerjaan  =  6  ×  15  =  90  orang-hari.  Untuk  selesai  dalam  10  hari\ndibutuhkan 90 / 10 = 9 orang. T ambahan yang diperlukan = 9 − 6 = 3 orang."
+  },
+  {
+    "id": 17,
+    "text": "8,0049 : 0,0015 = ...",
+    "options": [
+      "5336,6",
+      "533,66",
+      "53.366",
+      "53366",
+      "533,55"
+    ],
+    "correctIndex": 0,
+    "explanation": "8,0049 : 0,0015 = 80.049 : 15 = 5336,6."
+  },
+  {
+    "id": 18,
+    "text": "m × n = 32 (m dan n bilangan bulat positif). Berapa nilai minimum dari\nm + n − 2?",
+    "options": [
+      "17",
+      "10",
+      "13",
+      "25",
+      "27"
+    ],
+    "correctIndex": 1,
+    "explanation": "Pasangan  faktor  positif  dari  32:  (1,32),  (2,16),  (4,8).  Jumlah  m+n  minimum\ndicapai saat kedua faktor paling berimbang, yaitu (4,8) dengan jumlah 12. Maka m + n − 2 = 12\n− 2 = 10."
+  },
+  {
+    "id": 19,
+    "text": "P , Q, R, S, T akan diatur posisinya. P dan Q termasuk kategori yang\nsama dan tidak boleh berdekatan. S dan T juga termasuk kategori\nyang sama dan tidak boleh berdekatan. Susunan manakah yang\nmemenuhi kedua syarat tersebut?",
+    "options": [
+      "P, S, T, Q, R",
+      "P, Q, R, S, T",
+      "T, R, S, P, Q",
+      "S, R, P , T, Q",
+      "P, R, T, S, Q"
+    ],
+    "correctIndex": 3,
+    "explanation": "Syarat: P dan Q tidak boleh berdekatan; S dan T tidak boleh berdekatan. Periksa\nsetiap pilihan: (1) P,S,T,Q,R — S dan T berdekatan, tidak memenuhi. (2) P,Q,R,S,T — P dan Q\nberdekatan, tidak memenuhi. (3) T,R,S,P,Q — P dan Q berdekatan, tidak memenuhi. (4) S,R,P,T,Q\n— P di posisi ke-3 dan Q di posisi ke-5 (tidak berdekatan); S di posisi ke-1 dan T di posisi ke-4\n(tidak  berdekatan)  →  memenuhi  kedua  syarat.  (5)  P,R,T,S,Q  —  S  dan  T  berdekatan,  tidak\nmemenuhi. Jawaban: S, R, P, T, Q."
+  },
+  {
+    "id": 20,
+    "text": "\"Setiap ruang kerja bernomor 2 atau lebih dilengkapi LCD dan AC.\"\nSimpulan manakah yang paling tepat berdasarkan pernyataan\ntersebut?",
+    "options": [
+      "Tidak ada LCD & AC di ruang 1",
+      "LCD & AC ada di semua ruang",
+      "dan AC.\"\nSimpulan manakah yang paling tepat berdasarkan pernyataan\ntersebut?\nA. Tidak ada LCD & AC di ruang 1 \nB. LCD & AC ada di semua ruang\nC. LCD & AC hanya ada di ruang 2",
+      "Tidak ada LCD & AC di ruang 6",
+      "Ada LCD & AC di ruang selain ruang 2"
+    ],
+    "correctIndex": 2,
+    "explanation": "Pernyataan menyatakan fasilitas LCD & AC tersedia mulai ruang nomor 2 dan\nseterusnya. Artinya ruang nomor 1, yang berada di luar cakupan \"nomor 2 atau lebih\", tidak\ntermasuk yang dijamin memiliki fasilitas tersebut. Simpulan paling tepat: tidak ada LCD & AC di\nruang 1."
+  },
+  {
+    "id": 21,
+    "text": "Syarat beasiswa: nilai ≥ 80 DAN jumlah ekstrakurikuler ≥ 3. Data\n(nilai, jumlah ekskul): Arif (85, 2), Budi (90, 4), Citra (70, 3), Dedi (95,\n1), Eka (75, 3), Fina (88, 2), Gani (92, 3), Hilda (80, 4). Siapa yang\nlayak menerima beasiswa?",
+    "options": [
+      "jumlah ekstrakurikuler ≥ 3. Data\n(nilai, jumlah ekskul): Arif (85, 2), Budi (90, 4), Citra (70, 3), Dedi (95,\n1), Eka (75, 3), Fina (88, 2), Gani (92, 3), Hilda (80, 4). Siapa yang\nlayak menerima beasiswa?\nA. Arif, Budi, Citra",
+      "Budi, Gani, Hilda"
+    ],
+    "correctIndex": 1,
+    "explanation": "Periksa setiap orang terhadap kedua syarat (nilai ≥ 80 DAN ekskul ≥ 3): Budi (90,\n4) ✓✓ lolos; Gani (92, 3) ✓✓ lolos; Hilda (80, 4) ✓✓ lolos. Arif gagal syarat ekskul (hanya 2); Citra\ngagal syarat nilai (70); Dedi gagal syarat ekskul (hanya 1); Eka gagal syarat nilai (75); Fina gagal\nsyarat ekskul (hanya 2). Jawaban: Budi, Gani, Hilda."
+  },
+  {
+    "id": 22,
+    "text": "Sebuah kelas berisi 36 siswa. Pada suatu hari, 12 siswa absen (tidak\nhadir), dan 8 siswa lainnya izin keluar kelas saat pelajaran\nberlangsung. Berapa siswa yang ada di dalam kelas pada akhir\npelajaran?",
+    "options": [
+      "16",
+      "18",
+      "20",
+      "22",
+      "24"
+    ],
+    "correctIndex": 0,
+    "explanation": "36 siswa − 12 absen = 24 siswa hadir di awal. Kemudian 8 siswa izin keluar saat\npelajaran berlangsung, sehingga sisa di kelas = 24 − 8 = 16 siswa."
+  },
+  {
+    "id": 23,
+    "text": "Perjalanan dari Bandung ke Jakarta melewati Purwakarta. Purwakarta\nterletak di sebelah utara Bandung. Pernyataan manakah yang paling\nsesuai dengan informasi tersebut?",
+    "options": [
+      "Perjalanan bisa dilakukan tanpa melewati Purwakarta",
+      "Purwakarta terletak di sebelah selatan Jakarta",
+      "Purwakarta terletak tepat di tengah-tengah",
+      "Bandung terletak di sebelah selatan Purwakarta",
+      "Tidak ada simpulan yang bisa ditarik"
+    ],
+    "correctIndex": 3,
+    "explanation": "Pernyataan \"Purwakarta terletak di utara Bandung\" secara logis identik (hanya\nkebalikan arah penyebutan) dengan \"Bandung terletak di selatan Purwakarta\". Pernyataan ini\npasti benar karena merupakan penegasan ulang langsung dari premis yang diberikan, tanpa\nmemerlukan asumsi tambahan apa pun."
+  },
+  {
+    "id": 24,
+    "text": "Premis: \"Jika Bagas presentasi, maka investor senang.\" Manakah\npernyataan invers dari premis tersebut?",
+    "options": [
+      "Jika Bagas tidak presentasi, maka investor tidak senang",
+      "Jika Bagas tidak presentasi, maka investor senang",
+      "Jika investor tidak senang, maka Bagas tidak presentasi",
+      "Jika investor tidak senang, maka Bagas presentasi",
+      "Jika investor senang, maka Bagas presentasi"
+    ],
+    "correctIndex": 0,
+    "explanation": "Premis asal berbentuk \"Jika P, maka Q\" (P = Bagas presentasi, Q = investor\nsenang). Invers dari implikasi adalah \"Jika tidak P, maka tidak Q\", yaitu: \"Jika Bagas tidak\npresentasi, maka investor tidak senang.\" (Catatan: ini berbeda dari kontraposisi \"Jika tidak Q,\nmaka tidak P\", yang juga ada di pilihan namun bukan yang ditanyakan.)"
+  },
+  {
+    "id": 25,
+    "text": "Soal tidak tersedia di sumber asli (Bonus).",
+    "options": [
+      "Otomatis Benar",
+      "Kosong 1",
+      "Kosong 2",
+      "Kosong 3",
+      "Kosong 4"
+    ],
+    "correctIndex": 0,
+    "explanation": "Poin bonus diberikan secara otomatis karena soal asli tidak dapat diakses."
+  },
+  {
+    "id": 26,
+    "text": "Soal tidak tersedia di sumber asli (Bonus).",
+    "options": [
+      "Otomatis Benar",
+      "Kosong 1",
+      "Kosong 2",
+      "Kosong 3",
+      "Kosong 4"
+    ],
+    "correctIndex": 0,
+    "explanation": "Poin bonus diberikan secara otomatis karena soal asli tidak dapat diakses."
+  },
+  {
+    "id": 27,
+    "text": "Soal tidak tersedia di sumber asli (Bonus).",
+    "options": [
+      "Otomatis Benar",
+      "Kosong 1",
+      "Kosong 2",
+      "Kosong 3",
+      "Kosong 4"
+    ],
+    "correctIndex": 0,
+    "explanation": "Poin bonus diberikan secara otomatis karena soal asli tidak dapat diakses."
+  },
+  {
+    "id": 28,
+    "text": "Soal tidak tersedia di sumber asli (Bonus).",
+    "options": [
+      "Otomatis Benar",
+      "Kosong 1",
+      "Kosong 2",
+      "Kosong 3",
+      "Kosong 4"
+    ],
+    "correctIndex": 0,
+    "explanation": "Poin bonus diberikan secara otomatis karena soal asli tidak dapat diakses."
+  },
+  {
+    "id": 29,
+    "text": "Soal tidak tersedia di sumber asli (Bonus).",
+    "options": [
+      "Otomatis Benar",
+      "Kosong 1",
+      "Kosong 2",
+      "Kosong 3",
+      "Kosong 4"
+    ],
+    "correctIndex": 0,
+    "explanation": "Poin bonus diberikan secara otomatis karena soal asli tidak dapat diakses."
+  },
+  {
+    "id": 30,
+    "text": "Soal tidak tersedia di sumber asli (Bonus).",
+    "options": [
+      "Otomatis Benar",
+      "Kosong 1",
+      "Kosong 2",
+      "Kosong 3",
+      "Kosong 4"
+    ],
+    "correctIndex": 0,
+    "explanation": "Poin bonus diberikan secara otomatis karena soal asli tidak dapat diakses."
+  },
+  {
+    "id": 31,
+    "text": "GRATIFIKASI = ...",
+    "options": [
+      "Hadiah",
+      "Hukuman",
+      "Denda",
+      "Sanksi",
+      "T eguran"
+    ],
+    "correctIndex": 0,
+    "explanation": "Gratifikasi  secara  umum  berarti  pemberian  dalam  bentuk  hadiah/imbalan.\nSinonim yang tepat: Hadiah."
+  },
+  {
+    "id": 32,
+    "text": "REGISTRASI = ...",
+    "options": [
+      "Jadwal ulang",
+      "Pengaturan",
+      "Register",
+      "Pendaftaran Kembali",
+      "Pendaftaran"
+    ],
+    "correctIndex": 4,
+    "explanation": "Registrasi  berarti  proses  pencatatan/pendaftaran.  Sinonim  paling  tepat:\nPendaftaran."
+  },
+  {
+    "id": 33,
+    "text": "WANDU = ...",
+    "options": [
+      "Hobi",
+      "Opium",
+      "Banci",
+      "= ...\nA. Hobi\nB. Opium\nC. Banci \nD. Ikatan",
+      "Waspada"
+    ],
+    "correctIndex": 3,
+    "explanation": "Menurut  KBBI,  \"wandu\"  bermakna  banci  atau  tidak  tentu  jenis  kelaminnya.\nSinonim: Banci."
+  },
+  {
+    "id": 34,
+    "text": "IMPAS = ...",
+    "options": [
+      "= ...\nA. T ertinggal",
+      "Menang",
+      "Kalah",
+      "Unggul",
+      "Seimbang"
+    ],
+    "correctIndex": 4,
+    "explanation": "Impas berarti tidak untung dan tidak rugi (balance). Sinonim: Seimbang."
+  },
+  {
+    "id": 35,
+    "text": "RESIDU = ...",
+    "options": [
+      "Reduksi",
+      "Remisi",
+      "Sisa",
+      "= ...\nA. Reduksi\nB. Remisi\nC. Sisa \nD. Ampas",
+      "Hasil"
+    ],
+    "correctIndex": 3,
+    "explanation": "Residu berarti zat/bagian yang tertinggal atau tersisa dari suatu proses. Sinonim\nyang paling tepat: Sisa."
+  },
+  {
+    "id": 36,
+    "text": "EKAMATRA = ...",
+    "options": [
+      "Estimasi ukuran",
+      "Suku tunggal",
+      "Fisika",
+      "Metafisika",
+      "Gradien"
+    ],
+    "correctIndex": 1,
+    "explanation": "Dalam istilah matematika, \"ekamatra\" berarti monomial atau suku tunggal (eka\n= satu, matra = dimensi/suku). Sinonim: Suku tunggal."
+  },
+  {
+    "id": 37,
+    "text": "APROPRIASI = ...",
+    "options": [
+      "Pengambilalihan",
+      "Pemberian",
+      "Penyumbangan",
+      "Penghibahan",
+      "Penolakan"
+    ],
+    "correctIndex": 0,
+    "explanation": "Apropriasi berarti tindakan mengambil atau menguasai sesuatu untuk digunakan\nsendiri (sering tanpa izin). Sinonim: Pengambilalihan."
+  },
+  {
+    "id": 38,
+    "text": "AKURAT = ...",
+    "options": [
+      "= ...\nA. Ralat",
+      "Saksama",
+      "Selidik",
+      "Lugas",
+      "Aproksimasi"
+    ],
+    "correctIndex": 1,
+    "explanation": "Akurat berarti tepat dan cermat. Sinonim yang tepat: Saksama."
+  },
+  {
+    "id": 39,
+    "text": "BUTANG = ...",
+    "options": [
+      "Gembok",
+      "Resleting",
+      "Kerat",
+      "Kancing",
+      "Kunci"
+    ],
+    "correctIndex": 3,
+    "explanation": "Dalam  bahasa  Melayu/Indonesia  lama,  \"butang\"  berarti  kancing  (pengikat\npakaian). Sinonim: Kancing."
+  },
+  {
+    "id": 40,
+    "text": "GEGAI >< ...",
+    "options": [
+      ">< ...\nA. Petir",
+      "Sahih",
+      "Lemah",
+      "Kuat",
+      "Berhasil"
+    ],
+    "correctIndex": 3,
+    "explanation": "\"Gegai\"  bermakna  lemah/tidak  kuat/goyah.  Karena  soal  meminta  lawan  kata\n(antonim), jawabannya adalah Kuat."
+  },
+  {
+    "id": 41,
+    "text": "ANARKIS = ...",
+    "options": [
+      "Kacau",
+      "Otoriter",
+      "Disiplin",
+      "Legal",
+      "T ertib"
+    ],
+    "correctIndex": 0,
+    "explanation": "Anarkis berarti tanpa aturan/kacau, merujuk pada kondisi tanpa kendali. Sinonim:\nKacau."
+  },
+  {
+    "id": 42,
+    "text": "ABADI >< ...",
+    "options": [
+      "Abad",
+      "Fana",
+      "Dunia",
+      ">< ...\nA. Abad\nB. Fana \nC. Dunia\nD. Kecewa",
+      "Kehancuran"
+    ],
+    "correctIndex": 3,
+    "explanation": "Abadi berarti kekal/selamanya. Lawan katanya adalah fana, yang berarti tidak\nkekal/sementara."
+  },
+  {
+    "id": 43,
+    "text": "AMAL >< ...",
+    "options": [
+      ">< ...\nA. Mal",
+      "Kebaikan",
+      "Manusia",
+      "Janji",
+      "Perbuatan"
+    ],
+    "correctIndex": 3,
+    "explanation": "Amal merujuk pada perbuatan/tindakan nyata yang dilakukan. Dalam pemakaian\nidiomatik bahasa Indonesia, amal (tindakan/perbuatan) sering dikontraskan dengan janji (ucapan\ntanpa tindakan) — seperti pada ungkapan \"banyak janji, sedikit amal\". Jawaban yang paling\nmendekati sebagai lawan kata dari pilihan yang tersedia: Janji.\nCatatan:  Catatan: pasangan AMAL >< JANJI bukan antonim baku dalam kamus, melainkan kontras\nmakna yang lazim digunakan. Soal ini kemungkinan kurang ideal sebagai soal antonim murni."
+  },
+  {
+    "id": 44,
+    "text": "KEBIJAKAN >< ...",
+    "options": [
+      ">< ...\nA. Kebajikan",
+      "Keputusan",
+      "Kekacauan",
+      "Kerancauan",
+      "Kecerobohan"
+    ],
+    "correctIndex": 4,
+    "explanation": "Kebijakan  dalam  makna  \"kebijaksanaan\"  (sikap  arif  dan  cermat  dalam\nmengambil keputusan) berlawanan dengan kecerobohan (sikap tidak hati-hati/sembarangan)."
+  },
+  {
+    "id": 45,
+    "text": "CUCU >< ...",
+    "options": [
+      "Anak",
+      "Putri",
+      ">< ...\nA. Anak\nB. Putri\nC. Kakek",
+      "Cicit",
+      "Ayah"
+    ],
+    "correctIndex": 2,
+    "explanation": "Cucu adalah generasi di bawah (anak dari anak), sedangkan lawannya dalam\nhierarki keluarga adalah generasi di atas. Dari pilihan yang tersedia, jawaban yang tepat: Kakek."
+  },
+  {
+    "id": 46,
+    "text": "STAGNAN >< ...",
+    "options": [
+      ">< ...\nA. Beku",
+      "Mengalir",
+      "Mandek",
+      "T ersumbat",
+      "Bergerak"
+    ],
+    "correctIndex": 4,
+    "explanation": "Stagnan berarti tidak bergerak, macet, atau diam di tempat. Lawan katanya\nyang paling umum dan luas penggunaannya adalah Bergerak."
+  },
+  {
+    "id": 47,
+    "text": "EKSPRESI >< ...",
+    "options": [
+      "Kuasai",
+      "Cepat",
+      "Lambat",
+      "Impresi",
+      "Reaksi"
+    ],
+    "correctIndex": 3,
+    "explanation": "Ekspresi adalah pengungkapan sesuatu ke luar (outward), sedangkan impresi\nadalah kesan yang diterima/diserap ke dalam (inward). Keduanya merupakan pasangan lawan\nkata yang umum digunakan dalam tes kosakata."
+  },
+  {
+    "id": 48,
+    "text": "UNIVERSAL >< ...",
+    "options": [
+      ">< ...\nA. Parsial",
+      "Separatis",
+      "Lateral",
+      "Mondial",
+      "Fakultatif"
+    ],
+    "correctIndex": 0,
+    "explanation": "Universal berarti bersifat umum/menyeluruh, sedangkan lawan katanya adalah\nparsial, yang berarti sebagian/tidak menyeluruh."
+  },
+  {
+    "id": 49,
+    "text": "TUBUH : PAKAIAN = ...",
+    "options": [
+      "= ...\nA. KURVA : ALAM",
+      "LIDI : SAPU",
+      "MEJA : KOTAK",
+      ": SAPU\nC. MEJA : KOTAK\nD. BUKU : SAMPUL",
+      "JALAN : GARIS"
+    ],
+    "correctIndex": 3,
+    "explanation": "Hubungan TUBUH:PAKAIAN adalah objek yang dibungkus/dilindungi oleh sesuatu\ndi luarnya. Hubungan yang sama terdapat pada BUKU:SAMPUL, karena buku dilindungi oleh\nsampulnya."
+  },
+  {
+    "id": 50,
+    "text": "GELOMBANG : OMBAK = ...",
+    "options": [
+      "= ...\nA. GUNUNG : BUKIT",
+      "BERENANG : LARI",
+      "DANAU : LAUT",
+      "NUSA : PULAU",
+      "NADIR : ZENIT"
+    ],
+    "correctIndex": 3,
+    "explanation": "GELOMBANG dan OMBAK merupakan pasangan kata bersinonim (memiliki makna\nyang sama). Pasangan kata yang juga bersinonim adalah NUSA dan PULAU."
+  },
+  {
+    "id": 51,
+    "text": "RAMBUT : GUNDUL = ...",
+    "options": [
+      "LANTAI : LICIN",
+      "PAKAIAN : BUGIL",
+      "BOTAK : KEPALA",
+      "MOBIL : MOGOK",
+      "BULU : CABUT"
+    ],
+    "correctIndex": 1,
+    "explanation": "Hubungannya adalah \"ketiadaan X\" — gundul berarti tanpa rambut. Pola yang\nsama terdapat pada PAKAIAN:BUGIL, karena bugil berarti tanpa pakaian."
+  },
+  {
+    "id": 52,
+    "text": "DESIBEL : SUARA = ...",
+    "options": [
+      "ARE : JARAK",
+      "WARNA : MERAH",
+      "SUHU : TEMPERATUR",
+      "VOLT : LISTRIK",
+      ": SUARA = ...\nA. ARE : JARAK\nB. WARNA : MERAH\nC. SUHU : TEMPERATUR\nD. VOLT : LISTRIK \nE. KALORI : BERAT"
+    ],
+    "correctIndex": 4,
+    "explanation": "Desibel  adalah  satuan  untuk  mengukur  suara.  Hubungan  satuan-objek  yang\nsama terdapat pada VOLT:LISTRIK, karena volt adalah satuan untuk mengukur (tegangan) listrik."
+  },
+  {
+    "id": 53,
+    "text": "KOSONG : HAMPA = ...",
+    "options": [
+      "UBI : AKAR",
+      ": AKAR\nB. RIBUT : SERAK",
+      "PENUH : SESAK",
+      "SIANG : MALAM",
+      "CAIR : ENCER"
+    ],
+    "correctIndex": 4,
+    "explanation": "KOSONG dan HAMPA merupakan pasangan kata bersinonim. Pasangan yang juga\nbersinonim adalah CAIR dan ENCER, yang sama-sama menggambarkan kondisi suatu zat."
+  },
+  {
+    "id": 54,
+    "text": "GUNDUL : RAMBUT = ...",
+    "options": [
+      "BUGIL : PAKAIAN",
+      "KERAMIK : LANTAI",
+      "KEPALA : BOTAK",
+      "MOGOK : MOBIL",
+      "RAMBUT : BULU"
+    ],
+    "correctIndex": 0,
+    "explanation": "Ini  adalah  kebalikan  urutan  dari  soal  sebelumnya:  GUNDUL  (tanpa  rambut)\nberpola \"tanpa X\" : X. Pola yang sama terdapat pada BUGIL (tanpa pakaian) : PAKAIAN."
+  },
+  {
+    "id": 55,
+    "text": "Manakah kata yang tidak termasuk dalam kelompoknya?",
+    "options": [
+      "PIANO",
+      "GITAR",
+      "BIOLA",
+      "SERULING",
+      "LUKISAN"
+    ],
+    "correctIndex": 4,
+    "explanation": "Piano, gitar, biola, dan seruling adalah alat musik, sedangkan lukisan adalah\nkarya seni rupa, bukan alat musik."
+  },
+  {
+    "id": 56,
+    "text": "Manakah kata yang tidak termasuk dalam kelompoknya?",
+    "options": [
+      "ANOMALI",
+      "PARADIGMA",
+      "HIPOTESIS",
+      "TEOREMA",
+      "ANEKDOT"
+    ],
+    "correctIndex": 4,
+    "explanation": "Anomali,  paradigma,  hipotesis,  dan  teorema  adalah  istilah  yang  berkaitan\ndengan  konsep/metode  ilmiah,  sedangkan  anekdot  adalah  cerita  pendek/lucu  yang  tidak\nberkaitan dengan konsep keilmuan tersebut."
+  },
+  {
+    "id": 57,
+    "text": "Manakah kata yang tidak termasuk dalam kelompoknya?",
+    "options": [
+      "PANDA",
+      "KOALA",
+      "BERUANG",
+      "B. KOALA\nC. BERUANG\nD. HARIMAU",
+      "BAMBU"
+    ],
+    "correctIndex": 4,
+    "explanation": "Panda, koala, beruang, dan harimau adalah hewan, sedangkan bambu adalah\ntumbuhan."
+  },
+  {
+    "id": 58,
+    "text": "Manakah kata yang tidak termasuk dalam kelompoknya?",
+    "options": [
+      "GEOPOLITIK",
+      "GEOSENTRIS",
+      "GEOLOGI",
+      "GEOGRAFI",
+      "GEOMORFOLOGI"
+    ],
+    "correctIndex": 1,
+    "explanation": "Geopolitik, geologi, geografi, dan geomorfologi adalah nama bidang ilmu/disiplin\nstudi,  sedangkan  geosentris  adalah  nama  teori/model  (bumi  sebagai  pusat  alam  semesta),\nbukan nama bidang ilmu."
+  },
+  {
+    "id": 59,
+    "text": "Manakah kata yang tidak termasuk dalam kelompoknya?",
+    "options": [
+      "ESOTERIK",
+      "EKSOTERIK",
+      "EKSKLUSIF",
+      "MISTIS",
+      "HISTORIS"
+    ],
+    "correctIndex": 4,
+    "explanation": "Esoterik, eksoterik, eksklusif, dan mistis berkaitan dengan sifat tertutup, rahasia,\natau  khusus  suatu  pengetahuan,  sedangkan  historis  berkaitan  dengan  sejarah  dan  tidak\ntermasuk dalam tema tersebut."
+  },
+  {
+    "id": 60,
+    "text": "Manakah kata yang tidak termasuk dalam kelompoknya?",
+    "options": [
+      "ALFA",
+      "BRAVO",
+      "CHARLIE",
+      "DELTA",
+      "OMEGA"
+    ],
+    "correctIndex": 4,
+    "explanation": "Alfa, Bravo, Charlie, dan Delta adalah kode alfabet fonetik NATO (untuk huruf A,\nB, C, D), sedangkan Omega adalah huruf dalam alfabet Yunani dan bukan bagian dari alfabet\nfonetik NATO."
+  },
+  {
+    "id": 61,
+    "text": "I would have come earlier if I ___ the email.",
+    "options": [
+      "saw",
+      "had seen",
+      "have seen",
+      "see",
+      "seen"
+    ],
+    "correctIndex": 1,
+    "explanation": "Kalimat ini berbentuk Third Conditional (pengandaian yang berlawanan dengan\nkenyataan di masa lalu), dengan struktur: \"If + Past Perfect, ... would have + V3\". Jawaban yang\ntepat: \"had seen\"."
+  },
+  {
+    "id": 62,
+    "text": "If only she ___ more confident during the interview.",
+    "options": [
+      "is",
+      "has been",
+      "had been",
+      "would be",
+      "was"
+    ],
+    "correctIndex": 2,
+    "explanation": "\"If only\" yang menyesali kejadian di masa lampau menggunakan bentuk Past\nPerfect. Jawaban: \"had been\"."
+  },
+  {
+    "id": 63,
+    "text": "I ___ my phone at home.",
+    "options": [
+      "forgot",
+      "was forgetting",
+      "had forgotten",
+      "have forgotten",
+      "did forget"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kalimat  ini  menyatakan  fakta  sederhana  di  masa  lampau  tanpa  keterangan\nwaktu lain yang membutuhkan bentuk lampau sempurna, sehingga bentuk Simple Past \"forgot\"\nadalah yang paling natural dan tepat."
+  },
+  {
+    "id": 64,
+    "text": "He seems ___ busy lately.",
+    "options": [
+      "to be",
+      "being",
+      "be",
+      "to have been",
+      "to be being"
+    ],
+    "correctIndex": 0,
+    "explanation": "Setelah  kata  kerja  \"seems\",  digunakan  pola  \"to  be\"  +  adjective  untuk\nmenyatakan keadaan saat ini: \"seems to be busy\"."
+  },
+  {
+    "id": 65,
+    "text": "They were believed ___ across the border.",
+    "options": [
+      "escape",
+      "to have escaped",
+      "to escape",
+      "escaped",
+      "have escaped"
+    ],
+    "correctIndex": 1,
+    "explanation": "Struktur pasif untuk reporting verb (believed) yang merujuk pada peristiwa yang\ntelah terjadi sebelum waktu pelaporan menggunakan \"to have + V3\": \"were believed to have\nescaped\"."
+  },
+  {
+    "id": 66,
+    "text": "Hardly ___ the phone when it rang again.",
+    "options": [
+      "had I hung up",
+      "I had hung up",
+      "I hung up",
+      "have I hung up",
+      "been being"
+    ],
+    "correctIndex": 0,
+    "explanation": "Ketika kalimat dimulai dengan kata keterangan negatif seperti \"Hardly\", terjadi\ninversi subjek-auxiliary, dan digunakan Past Perfect untuk menyatakan kejadian yang baru saja\nselesai sebelum kejadian lain terjadi: \"Hardly had I hung up... when...\"."
+  },
+  {
+    "id": 67,
+    "text": "He didn't deny ___ involved in the scandal.",
+    "options": [
+      "being",
+      "to be",
+      "have been",
+      "was",
+      "at"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kata kerja \"deny\" diikuti oleh bentuk gerund (V-ing): \"deny being involved\"."
+  },
+  {
+    "id": 68,
+    "text": "The new policy is more lenient than the one it ___.",
+    "options": [
+      "replaces",
+      "is replacing",
+      "replaced",
+      "had replaced",
+      "has been replacing"
+    ],
+    "correctIndex": 0,
+    "explanation": "Kalimat  membandingkan  kebijakan  baru  dengan  kebijakan  yang  (saat  ini)\ndigantikannya, menggunakan Simple Present untuk merujuk pada hubungan yang berlaku saat\nini: \"than the one it replaces\"."
+  },
+  {
+    "id": 69,
+    "text": "Despite ___ early, he still missed the train.",
+    "options": [
+      "leaving",
+      "to leave",
+      "leave",
+      "left",
+      "had left"
+    ],
+    "correctIndex": 0,
+    "explanation": "Setelah kata \"despite\", digunakan bentuk gerund (V-ing): \"despite leaving early\".\nBAGIAN VIII — Microsoft Office (Word, Excel, PowerPoint)"
+  },
+  {
+    "id": 70,
+    "text": "Bagaimana cara mengatur spasi antarhuruf (kerning) pada Microsoft\nWord?",
+    "options": [
+      "Spacing di tab Home",
+      "Character Spacing di Design",
+      "Tidak mungkin dilakukan",
+      "Font di tab References",
+      "Adjust Letterspacing di tab Format"
+    ],
+    "correctIndex": 1,
+    "explanation": "Pengaturan  jarak  antarhuruf  (character  spacing/kerning)  di  Word  dilakukan\nmelalui kotak dialog Font (bagian Advanced > Character Spacing). Dari pilihan yang tersedia,\nistilah yang paling sesuai dengan fitur ini adalah \"Character Spacing\"."
+  },
+  {
+    "id": 71,
+    "text": "Untuk menambahkan bentuk seperti panah atau kotak pada dokumen\nWord, menu yang digunakan adalah ...",
+    "options": [
+      "Icons",
+      "Shapes",
+      "SmartArt",
+      "Chart",
+      "Styles"
+    ],
+    "correctIndex": 1,
+    "explanation": "Untuk menambahkan bentuk seperti panah, kotak, lingkaran, dan sejenisnya,\ngunakan menu Insert > Shapes."
+  },
+  {
+    "id": 72,
+    "text": "Untuk mencetak hanya halaman 2 sampai 4 pada dokumen Word, fitur\nyang digunakan adalah ...",
+    "options": [
+      "Page Setup",
+      "Printer Settings",
+      "Print Range",
+      "Custom Print",
+      "Page Break"
+    ],
+    "correctIndex": 2,
+    "explanation": "Untuk  mencetak  rentang  halaman  tertentu  (misalnya  halaman  2  sampai  4),\ngunakan kolom rentang cetak (Print Range/Pages) pada dialog Print, lalu ketik \"2-4\"."
+  },
+  {
+    "id": 73,
+    "text": "Apa fungsi \"Gridlines\" pada tabel di Microsoft Word?",
+    "options": [
+      "Menyusun grid yang terpisah dari tabel",
+      "Menyaring data dalam tabel",
+      "Mengubah warna sel tabel",
+      "Menampilkan garis bantu pada tabel",
+      "Tidak memiliki fungsi"
+    ],
+    "correctIndex": 3,
+    "explanation": "\"View Gridlines\" menampilkan garis bantu pada tabel agar struktur sel terlihat\njelas saat diedit, namun garis ini tidak akan ikut tercetak (berbeda dengan border)."
+  },
+  {
+    "id": 74,
+    "text": "Apa fungsi \"Master Document\" (Dokumen Sumber) pada Microsoft\nWord?",
+    "options": [
+      "Menyusun beberapa dokumen menjadi satu",
+      "Menyusun gaya/style penulisan",
+      "Membuat daftar isi",
+      "Membuat catatan kaki",
+      "Tidak memiliki fungsi"
+    ],
+    "correctIndex": 0,
+    "explanation": "Master Document digunakan untuk menggabungkan beberapa dokumen terpisah\n(sub-dokumen) menjadi satu dokumen besar yang terorganisir."
+  },
+  {
+    "id": 75,
+    "text": "Fitur apa yang digunakan untuk mengisi nama penerima yang\nberbeda-beda secara otomatis pada surat massal?",
+    "options": [
+      "Page Setup",
+      "Merge & Center",
+      "Mail Merge",
+      "SmartArt",
+      "Comments"
+    ],
+    "correctIndex": 2,
+    "explanation": "Mail Merge digunakan untuk membuat surat massal dengan data penerima yang\nberbeda-beda secara otomatis dari sumber data (misalnya dari file Excel)."
+  },
+  {
+    "id": 76,
+    "text": "Bagaimana cara membuat daftar isi yang otomatis menjadi hyperlink\n(tautan) ke setiap bagian dokumen di Word?",
+    "options": [
+      "Insert Hyperlink di tab Design",
+      "Create Hyperlink di tab Home",
+      "Table of Contents di tab References",
+      "Tidak mungkin dilakukan",
+      "Insert Link di tab Format"
+    ],
+    "correctIndex": 2,
+    "explanation": "Daftar isi otomatis (yang juga otomatis menjadi tautan ke setiap bagian) dibuat\nmelalui menu References > T able of Contents, dengan syarat heading sudah diberi format style\nyang sesuai (Heading 1, Heading 2, dst)."
+  },
+  {
+    "id": 77,
+    "text": "Fungsi =TODAY() pada Microsoft Excel akan menampilkan ...",
+    "options": [
+      "Tanggal sekarang",
+      "Waktu sekarang",
+      "Hari dalam minggu ini",
+      "Bulan ini",
+      "Jam komputer"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fungsi  =TODAY()  menampilkan  tanggal  sistem/komputer  saat  ini  secara\notomatis."
+  },
+  {
+    "id": 78,
+    "text": "Bagaimana cara mengunci referensi sel B2 agar tidak berubah saat\nformula disalin ke sel lain?",
+    "options": [
+      "$B$2",
+      "agar tidak berubah saat\nformula disalin ke sel lain?\nA. $B$2 \nB. B2",
+      "$B2",
+      "B$2",
+      "#B#2"
+    ],
+    "correctIndex": 1,
+    "explanation": "T anda dolar ($) yang diletakkan sebelum kolom dan baris menjadikan referensi\nsel bersifat absolut, sehingga tidak berubah saat formula disalin/disebar: $B$2."
+  },
+  {
+    "id": 79,
+    "text": "Rumus yang tepat untuk menjumlahkan nilai pada kolom A jika kolom\nB bertuliskan \"Produk A\" adalah ...",
+    "options": [
+      "adalah ...\nA. =SUMIF(B:B,\"Produk A\",A:A)",
+      "=SUMIFS(A:A,B:B,\"Produk A\")",
+      "=SUMIF(A:A,\"Produk A\")",
+      "=SUM(A:A,B:B,\"Produk A\")",
+      "=TOTALIF(B:B,\"Produk A\",A:A)"
+    ],
+    "correctIndex": 0,
+    "explanation": "Fungsi  SUMIF  memiliki  sintaks  =SUMIF(range_kriteria,  kriteria,\nrange_yang_dijumlah). Karena kriteria berada di kolom B dan yang dijumlahkan adalah kolom A,\nmaka rumus yang benar adalah =SUMIF(B:B,\"Produk A\",A:A).\nCatatan:  Catatan: rumus =SUMIFS(A:A,B:B,\"Produk A\") pada pilihan kedua sebenarnya juga akan\nmenghasilkan output yang sama secara fungsional, namun =SUMIF adalah jawaban yang paling lazim\ndigunakan untuk kasus kriteria tunggal seperti ini."
+  },
+  {
+    "id": 80,
+    "text": "Fitur Excel yang digunakan untuk memeriksa dan menandai kesalahan\npada rumus adalah ...",
+    "options": [
+      "Formula Bar",
+      "Error Checker",
+      "Trace Precedents",
+      "Evaluate Formula",
+      "Function Wizard"
+    ],
+    "correctIndex": 1,
+    "explanation": "Excel memiliki fitur \"Error Checking\" (pada tab Formulas) yang secara otomatis\nmenandai dan membantu memeriksa kesalahan pada rumus."
+  },
+  {
+    "id": 81,
+    "text": "Fitur Excel yang membuat isi sel otomatis mengecil agar tidak\nterpotong saat terlalu panjang untuk ditampilkan adalah ...",
+    "options": [
+      "Wrap T ext",
+      "Shrink to Fit",
+      "Merge & Center",
+      "Clip T ext",
+      "Align T ext"
+    ],
+    "correctIndex": 1,
+    "explanation": "Fitur  \"Shrink  to  Fit\"  secara  otomatis  memperkecil  ukuran  teks  agar  pas\nditampilkan dalam sel tanpa terpotong, berbeda dengan Wrap T ext yang membuat teks turun ke\nbaris baru."
+  },
+  {
+    "id": 82,
+    "text": "Rumus yang digunakan untuk menghitung jumlah sel yang memenuhi\nsuatu kriteria tertentu adalah ...",
+    "options": [
+      "=SUM()",
+      "=COUNT()",
+      "=AVERAGE()",
+      "=IF()",
+      "=SUMIF()"
+    ],
+    "correctIndex": 1,
+    "explanation": "Secara  teknis,  fungsi  yang  paling  tepat  untuk  \"menghitung  jumlah  sel  yang\nmemenuhi  kriteria  tertentu\"  adalah  =COUNTIF(),  namun  fungsi  tersebut  tidak  tercantum  di\nantara  pilihan  jawaban  yang  tersedia  (kemungkinan  ada  kesalahan  transkripsi  pada  soal\nsumber). Jika hanya menghitung jumlah sel berisi data/angka tanpa kriteria khusus, jawaban\nyang paling mendekati dari pilihan yang ada adalah =COUNT().\nCatatan:  Catatan: idealnya jawaban yang benar adalah =COUNTIF(), yang tidak ada pada pilihan.\nDisarankan mengecek ulang soal asli bila tersedia."
+  },
+  {
+    "id": 83,
+    "text": "Efek yang menampilkan pergeseran posisi teks/objek disertai\nperubahan warna secara dramatis antarslide di PowerPoint disebut ...",
+    "options": [
+      "Color Transition",
+      "Morph Transition",
+      "Entrance Animation",
+      "Slide Transition",
+      "Custom Animation"
+    ],
+    "correctIndex": 1,
+    "explanation": "Fitur Morph Transition di PowerPoint dapat menciptakan efek perpindahan posisi,\nukuran, dan warna objek secara mulus antarslide."
+  },
+  {
+    "id": 84,
+    "text": "Untuk menambahkan suara latar belakang yang terus berputar di\nseluruh presentasi, langkah yang digunakan adalah ...",
+    "options": [
+      "Background Audio di tab Home",
+      "Add Sound per slide",
+      "Insert Audio di tab Insert",
+      "Record Audio per slide",
+      "Tidak mungkin dilakukan"
+    ],
+    "correctIndex": 2,
+    "explanation": "Audio  latar  untuk  seluruh  presentasi  ditambahkan  melalui  Insert  >  Audio,\nkemudian pada tab Playback diatur opsi \"Play across slides\" agar suara berjalan terus dari slide\npertama hingga akhir."
+  },
+  {
+    "id": 85,
+    "text": "Untuk menambahkan efek suara yang menyertai transisi pada slide\ntertentu, fitur yang digunakan adalah ...",
+    "options": [
+      "Transition Sound",
+      "Insert Sound",
+      "Slide Sound",
+      "Sound Transition",
+      "Tidak mungkin dilakukan"
+    ],
+    "correctIndex": 0,
+    "explanation": "Pada tab Transitions, terdapat opsi \"Sound\" untuk menambahkan efek suara\nyang menyertai transisi pada slide tertentu."
+  },
+  {
+    "id": 86,
+    "text": "Untuk memulai presentasi dari slide tertentu (bukan dari slide\npertama), caranya adalah ...",
+    "options": [
+      "Start From Slide",
+      "Set Starting Slide",
+      "Auto Start",
+      "Beginning Slide",
+      "Tidak mungkin dilakukan"
+    ],
+    "correctIndex": 1,
+    "explanation": "PowerPoint  memungkinkan  presentasi  dimulai  dari  slide  tertentu,  misalnya\ndengan memilih slide tersebut lebih dulu kemudian memilih \"Start from Current Slide\", atau\nmengatur slide awal melalui Set Up Slide Show."
+  },
+  {
+    "id": 87,
+    "text": "Untuk membuat animasi teks yang muncul satu kata demi satu kata\nsecara berurutan, fitur yang digunakan adalah ...",
+    "options": [
+      "Appear per kata",
+      "Sequential Animation",
+      "Animate One by One",
+      "Fade In per kata",
+      "Tidak mungkin dilakukan"
+    ],
+    "correctIndex": 2,
+    "explanation": "Pada pengaturan Effect Options dari animasi teks, terdapat opsi \"Animate text\"\nyang dapat diatur menjadi \"By Word\", sehingga teks muncul kata demi kata secara berurutan."
+  },
+  {
+    "id": 88,
+    "text": "Untuk membuat diagram batang yang tampil secara dinamis (misalnya\nmuncul per kategori data) di PowerPoint, fitur yang digunakan\nadalah ...",
+    "options": [
+      "Morph Transition",
+      "Chart Animation",
+      "Audio Clip",
+      "Slide Transition",
+      "Motion Path Animation"
+    ],
+    "correctIndex": 1,
+    "explanation": "Untuk  membuat  diagram/grafik  batang  tampil  secara  dinamis  (misalnya  per\nkategori atau per seri data), gunakan fitur Chart Animation."
+  },
+  {
+    "id": 89,
+    "text": "Untuk menambahkan efek suara pada tombol navigasi (action button)\ndi PowerPoint, fitur yang digunakan adalah ...",
+    "options": [
+      "Navigation Sound",
+      "Link Sound",
+      "Button Sound",
+      "Sound Button",
+      "Tidak mungkin dilakukan"
+    ],
+    "correctIndex": 2,
+    "explanation": "T ombol aksi (Action Buttons) di PowerPoint dapat diberikan efek suara melalui\npengaturan Action Settings, yang umum disebut sebagai \"Button Sound\"."
+  },
+  {
+    "id": 90,
+    "text": "Untuk membuat efek bayangan yang dramatis pada teks di\nPowerPoint, fitur yang digunakan adalah ...",
+    "options": [
+      "Shadow Effect",
+      "Morph Transition",
+      "Animation Painter",
+      "Slide Transition",
+      "Custom Animation"
+    ],
+    "correctIndex": 0,
+    "explanation": "Efek bayangan pada teks diatur melalui T ext Effects > Shadow (Shadow Effect)\npada menu format teks."
+  },
+  {
+    "id": 91,
+    "text": "Untuk membuat tautan cepat antarslide saat presentasi berjalan, fitur\nyang digunakan adalah ...",
+    "options": [
+      "Hyperlink",
+      "Slide Transition",
+      "Zoom Transition",
+      "Morph Transition",
+      "Animation Trigger"
+    ],
+    "correctIndex": 0,
+    "explanation": "Hyperlink memungkinkan pembuatan tautan cepat untuk berpindah ke slide lain,\nfile lain, atau alamat web tertentu saat presentasi berjalan."
+  },
+  {
+    "id": 92,
+    "text": "Bagaimana etika yang benar dalam menulis subjek (subject) email?",
+    "options": [
+      "Dibuat panjang dan rumit",
+      "Tidak perlu menggunakan subjek",
+      "Mencerminkan isi email",
+      "Menggunakan emoji",
+      "Menggunakan tautan"
+    ],
+    "correctIndex": 2,
+    "explanation": "Subjek email yang baik harus singkat, jelas, dan mencerminkan isi/maksud email\nagar penerima cepat memahami konteksnya."
+  },
+  {
+    "id": 93,
+    "text": "Hal apa yang penting diperhatikan dalam menulis email, terutama\ndalam konteks formal/resmi?",
+    "options": [
+      "Menggunakan warna mencolok",
+      "Menyertakan semua jenis lampiran",
+      "Menggunakan emoji",
+      "Menggunakan bahasa formal",
+      "Menghindari semua tanda baca"
+    ],
+    "correctIndex": 3,
+    "explanation": "Email, terutama dalam konteks resmi/profesional seperti seleksi CPNS, sebaiknya\nmenggunakan bahasa yang formal dan sopan."
+  },
+  {
+    "id": 94,
+    "text": "Subjek email yang tepat ketika membalas tawaran kerja dari sebuah\nperusahaan adalah ...",
+    "options": [
+      "Penawaran T erbaik",
+      "Penawaran Kerja",
+      "Ayo Bergabung",
+      "Re: Penawaran Kerja",
+      "Mau Dapat Pekerjaan?"
+    ],
+    "correctIndex": 3,
+    "explanation": "Saat  membalas  email,  gunakan  format  \"Re:\"  diikuti  subjek  asli  agar  mudah\ndilacak dalam rangkaian percakapan (thread), yaitu \"Re: Penawaran Kerja\"."
+  },
+  {
+    "id": 95,
+    "text": "Informasi penting sebaiknya disampaikan melalui email dengan cara ...",
+    "options": [
+      "Menggunakan huruf besar semua",
+      "Diletakkan di bagian akhir email",
+      "Menyertakan banyak lampiran",
+      "T anpa menggunakan subjek email",
+      "Menggunakan bahasa yang jelas dan langsung"
+    ],
+    "correctIndex": 4,
+    "explanation": "Informasi  penting  sebaiknya  disampaikan  dengan  bahasa  yang  jelas  dan\nlangsung agar mudah dipahami dan tidak menimbulkan ambiguitas."
+  },
+  {
+    "id": 96,
+    "text": "Subjek email yang paling tepat ketika tidak dapat menghadiri sebuah\nrapat adalah ...",
+    "options": [
+      "Rapat Hari Ini",
+      "Tidak Bisa Hadir",
+      "Penting!",
+      "Liburan",
+      "Saya Sudah Tidak Bisa Hadir"
+    ],
+    "correctIndex": 1,
+    "explanation": "Subjek email idealnya singkat namun jelas menggambarkan isi pesan. \"Tidak\nBisa Hadir\" sudah cukup jelas dan ringkas dibandingkan pilihan lain yang terlalu umum (\"Rapat\nHari Ini\", \"Penting!\") atau kurang formal (\"Liburan\")."
+  },
+  {
+    "id": 97,
+    "text": "Bagaimana cara penggunaan huruf kapital yang benar dalam menulis\nemail?",
+    "options": [
+      "Kapital pada setiap kata",
+      "Kapital pada kata-kata penting saja",
+      "Menghindari huruf kapital sama sekali",
+      "Kapital pada awal kalimat",
+      "Kapital pada seluruh isi email"
+    ],
+    "correctIndex": 3,
+    "explanation": "Aturan  kapitalisasi  standar  dalam  menulis  email  adalah  menggunakan  huruf\nkapital di awal setiap kalimat dan untuk nama diri/kata khusus, bukan untuk seluruh isi (yang\nterkesan berteriak) maupun setiap kata.\nCatatan:  Catatan: pada dokumen sumber, pilihan ini tertulis sebagai \"Akhir kalimat\", yang\nkemungkinan merupakan kesalahan ketik dari \"Awal kalimat\" — konsep yang benar dan dimaksudkan\ndalam pembahasan ini."
+  },
+  {
+    "id": 98,
+    "text": "Cara yang benar dalam menggunakan fitur \"Reply All\" pada email\nadalah ...",
+    "options": [
+      "Mengirim balasan ke semua penerima asli email",
+      "Mengirim balasan hanya ke penerima utama",
+      "Mengabaikan email tersebut",
+      "Mengirim balasan ke semua kontak di address book",
+      "Hanya digunakan untuk email formal"
+    ],
+    "correctIndex": 0,
+    "explanation": "\"Reply All\" mengirimkan balasan kepada seluruh penerima asli yang tercantum\ndalam email (baik di kolom T o maupun Cc), bukan ke seluruh daftar kontak."
+  },
+  {
+    "id": 99,
+    "text": "Etika yang baik saat menerima email yang berisi informasi penting\nadalah ...",
+    "options": [
+      "Membalas dengan tegas",
+      "Meneruskan (forward) ke semua orang",
+      "Menyimpannya tanpa konfirmasi",
+      "Memberikan konfirmasi penerimaan secara langsung dan sopan",
+      "Mengabaikannya"
+    ],
+    "correctIndex": 3,
+    "explanation": "Etika  yang  baik  saat  menerima  email  penting  adalah  segera  memberikan\nkonfirmasi penerimaan secara langsung dan dengan bahasa yang sopan."
+  },
+  {
+    "id": 100,
+    "text": "Jika menerima email yang meminta informasi pribadi/rahasia secara\nmencurigakan, tindakan yang tepat adalah ...",
+    "options": [
+      "Memberikan informasi yang diminta",
+      "Melaporkan sebagai spam",
+      "Menyimpannya saja",
+      "Meneruskan (forward) ke teman",
+      "Tidak memberikan informasi dan melaporkannya"
+    ],
+    "correctIndex": 4,
+    "explanation": "Jika  menerima  email  yang  meminta  informasi  pribadi/rahasia  secara\nmencurigakan  (indikasi  phishing),  sebaiknya  tidak  memberikan  informasi  tersebut  dan\nmelaporkannya sebagai langkah pencegahan penipuan."
+  }
+];
+
+    const totalQuestions = questions.length;
+    const answers = new Array(totalQuestions).fill(null);
+    let currentIndex = 0;
+
+    const questionTitle = document.getElementById("questionTitle");
+    const questionText = document.getElementById("questionText");
+    const optionsList = document.getElementById("optionsList");
+    const questionGrid = document.getElementById("questionGrid");
+    const watermark = document.getElementById("watermark");
+
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const submitBtn = document.getElementById("submitBtn");
+
+    const startOverlay = document.getElementById("startOverlay");
+    const startBtn = document.getElementById("startBtn");
+
+    const summaryOverlay = document.getElementById("summaryOverlay");
+    const summaryScore = document.getElementById("summaryScore");
+    const summaryCorrect = document.getElementById("summaryCorrect");
+    const summaryWrong = document.getElementById("summaryWrong");
+    const summaryEmpty = document.getElementById("summaryEmpty");
+    const summaryNote = document.getElementById("summaryNote");
+    const summarySectionStats = document.getElementById("summarySectionStats");
+    const summaryPrintBtn = document.getElementById("summaryPrintBtn");
+    const summaryCloseBtn = document.getElementById("summaryCloseBtn");
+    const reviewBtn = document.getElementById("reviewBtn");
+
+    const resultOverlay = document.getElementById("resultOverlay");
+    const resultScore = document.getElementById("resultScore");
+    const resultSummary = document.getElementById("resultSummary");
+    const resultContent = document.getElementById("resultContent");
+    const printResultBtn = document.getElementById("printResultBtn");
+    const closeResultBtn = document.getElementById("closeResultBtn");
+
+    const timerEl = document.getElementById("timer");
+    let remainingSeconds = 60 * 60; // 60 menit
+    let timerInterval = null;
+
+    const choiceLetters = ["A", "B", "C", "D", "E"];
+
+    function renderQuestionNumbers() {
+      questionGrid.innerHTML = "";
+      for (let i = 0; i < totalQuestions; i++) {
+        const btn = document.createElement("div");
+        btn.className = "question-number";
+        btn.textContent = i + 1;
+        btn.dataset.index = i;
+        btn.addEventListener("click", () => {
+          goToQuestion(i);
+        });
+        questionGrid.appendChild(btn);
+      }
+    }
+
+    function updateQuestionGridState() {
+      const nodes = questionGrid.querySelectorAll(".question-number");
+      nodes.forEach((node, i) => {
+        node.classList.remove("active");
+        node.classList.toggle("answered", answers[i] !== null);
+        if (i === currentIndex) node.classList.add("active");
+      });
+    }
+
+    function renderQuestion() {
+      const q = questions[currentIndex];
+
+      questionTitle.textContent = "Soal #" + q.id;
+      questionText.textContent = q.text;
+      watermark.textContent = q.id.toString().padStart(2, "0");
+
+      optionsList.innerHTML = "";
+      q.options.forEach((opt, idx) => {
+        const optionId = `q${q.id}_opt${idx}`;
+        const wrapper = document.createElement("label");
+        wrapper.className = "option-item";
+
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "q" + q.id;
+        input.id = optionId;
+        input.value = idx;
+        if (answers[currentIndex] === idx) input.checked = true;
+
+        input.addEventListener("change", () => {
+          answers[currentIndex] = idx;
+          updateQuestionGridState();
+        });
+
+        const span = document.createElement("span");
+        span.className = "option-label";
+        span.textContent = choiceLetters[idx] + ". " + opt;
+
+        wrapper.appendChild(input);
+        wrapper.appendChild(span);
+        optionsList.appendChild(wrapper);
+      });
+
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex === totalQuestions - 1;
+
+      updateQuestionGridState();
+    }
+
+    function goToQuestion(index) {
+      currentIndex = index;
+      renderQuestion();
+    }
+
+    prevBtn.addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (currentIndex < totalQuestions - 1) {
+        currentIndex++;
+        renderQuestion();
+      }
+    });
+
+    /* ------------ TIMER ------------ */
+    function formatTime(sec) {
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      const hh = String(h).padStart(2, "0");
+      const mm = String(m).padStart(2, "0");
+      const ss = String(s).padStart(2, "0");
+      return `${hh} : ${mm} : ${ss}`;
+    }
+
+    function updateTimerDisplay() {
+      timerEl.textContent = formatTime(remainingSeconds);
+    }
+
+    function tick() {
+      remainingSeconds--;
+      if (remainingSeconds <= 0) {
+        remainingSeconds = 0;
+        updateTimerDisplay();
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        alert("Waktu ujian telah habis. Rekap hasil dan pembahasan akan ditampilkan.");
+        showResults(true);
+      } else {
+        updateTimerDisplay();
+      }
+    }
+
+    function startTimer() {
+      if (timerInterval) return;
+      updateTimerDisplay();
+      timerInterval = setInterval(tick, 1000);
+    }
+
+    /* ------------ PERHITUNGAN & GRAFIK ------------ */
+
+    const sectionDefs = [{
+        name: "Numerik",
+        startId: 1,
+        endId: 20
+      },
+      {
+        name: "Penalaran",
+        startId: 21,
+        endId: 40
+      },
+      {
+        name: "Spasial",
+        startId: 41,
+        endId: 60
+      },
+      {
+        name: "Verbal & Inggris",
+        startId: 61,
+        endId: 80
+      },
+      {
+        name: "Ms Office & Email",
+        startId: 81,
+        endId: 100
+      }
+    ];
+
+    const barColors = ["#42a5f5", "#66bb6a", "#ffca28", "#ab47bc", "#ef5350"];
+
+    function computeSectionStats() {
+      const stats = sectionDefs.map(sec => ({
+        name: sec.name,
+        total: sec.endId - sec.startId + 1,
+        correct: 0
+      }));
+
+      questions.forEach((q, qIdx) => {
+        const ans = answers[qIdx];
+        const isCorrect = ans !== null && ans === q.correctIndex;
+        if (!isCorrect) return;
+
+        const secIndex = sectionDefs.findIndex(
+          sec => q.id >= sec.startId && q.id <= sec.endId
+        );
+        if (secIndex >= 0) {
+          stats[secIndex].correct++;
+        }
+      });
+
+      return stats;
+    }
+
+    function renderSectionBars(stats) {
+      summarySectionStats.innerHTML = "";
+      stats.forEach((sec, idx) => {
+        const row = document.createElement("div");
+        row.className = "section-bar-row";
+
+        const label = document.createElement("div");
+        label.className = "section-bar-label";
+        label.textContent = sec.name;
+
+        const track = document.createElement("div");
+        track.className = "section-bar-track";
+
+        const fill = document.createElement("div");
+        fill.className = "section-bar-fill";
+        const pct = sec.total > 0 ? Math.round((sec.correct / sec.total) * 100) : 0;
+        fill.style.width = pct + "%";
+        fill.style.background = barColors[idx % barColors.length];
+
+        track.appendChild(fill);
+
+        const value = document.createElement("div");
+        value.className = "section-bar-value";
+        value.textContent = `${sec.correct}/${sec.total} (${pct}%)`;
+
+        row.appendChild(label);
+        row.appendChild(track);
+        row.appendChild(value);
+
+        summarySectionStats.appendChild(row);
+      });
+    }
+
+    /* ------------ HASIL & PEMBAHASAN ------------ */
+    function showResults(autoSubmit = false) {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+
+      let correct = 0;
+      let wrong = 0;
+      let empty = 0;
+
+      questions.forEach((q, idx) => {
+        const ans = answers[idx];
+        if (ans === null) {
+          empty++;
+        } else if (ans === q.correctIndex) {
+          correct++;
+        } else {
+          wrong++;
+        }
+      });
+
+      const score = Math.round((correct / totalQuestions) * 100);
+
+      // --- RINGKASAN (SKOR & GRAFIK) ---
+      summaryScore.textContent = `${score}`;
+      summaryCorrect.textContent = correct;
+      summaryWrong.textContent = wrong;
+      summaryEmpty.textContent = empty;
+      summaryNote.textContent = autoSubmit ?
+        "Ujian berakhir karena waktu habis." :
+        "Ujian telah disubmit.";
+
+      const sectionStats = computeSectionStats();
+      renderSectionBars(sectionStats);
+
+      // --- DETAIL (REVIEW SOAL) ---
+      resultScore.textContent = `${correct} / ${totalQuestions}`;
+      resultSummary.textContent =
+        `Benar: ${correct}, Salah: ${wrong}, Kosong: ${empty}.` +
+        (autoSubmit ? " (Ujian berakhir karena waktu habis)" : "");
+
+      resultContent.innerHTML = "";
+      questions.forEach((q, idx) => {
+        const userAns = answers[idx];
+        const isEmpty = userAns === null;
+        const isCorrect = !isEmpty && userAns === q.correctIndex;
+
+        const div = document.createElement("div");
+        div.className = "result-question";
+
+        const header = document.createElement("div");
+        header.className = "result-header";
+
+        const title = document.createElement("strong");
+        title.textContent = `Soal #${q.id}`;
+
+        const badge = document.createElement("span");
+        badge.classList.add("badge");
+        if (isEmpty) {
+          badge.classList.add("empty");
+          badge.textContent = "Kosong";
+        } else if (isCorrect) {
+          badge.classList.add("correct");
+          badge.textContent = "Benar";
+        } else {
+          badge.classList.add("wrong");
+          badge.textContent = "Salah";
+        }
+
+        header.appendChild(title);
+        header.appendChild(badge);
+
+        const textP = document.createElement("p");
+        textP.textContent = q.text;
+
+        const ul = document.createElement("ul");
+        ul.className = "result-options";
+        q.options.forEach((opt, oIdx) => {
+          const li = document.createElement("li");
+          let label = `${choiceLetters[oIdx]}. ${opt}`;
+          if (oIdx === q.correctIndex) {
+            label += " (kunci)";
+            li.classList.add("answer-highlight");
+          }
+          li.textContent = label;
+          ul.appendChild(li);
+        });
+
+        const yourAnsP = document.createElement("p");
+        const yourLabel = isEmpty ?
+          "Kosong" :
+          `${choiceLetters[userAns]}. ${q.options[userAns]}`;
+        yourAnsP.innerHTML = `<strong>Jawaban Anda:</strong> ${yourLabel}`;
+
+        const correctAnsP = document.createElement("p");
+        correctAnsP.innerHTML = `<strong>Jawaban Benar:</strong> ${choiceLetters[q.correctIndex]}. ${q.options[q.correctIndex]}`;
+
+        const expP = document.createElement("p");
+        // Ganti newline jadi <br> agar tampil rapi di HTML
+        const cleanExplanation = q.explanation.replace(/\n/g, "<br>");
+        expP.innerHTML = `<strong>Penjelasan:</strong> ${cleanExplanation}`;
+
+        div.appendChild(header);
+        div.appendChild(textP);
+        div.appendChild(ul);
+        div.appendChild(yourAnsP);
+        div.appendChild(correctAnsP);
+        div.appendChild(expP);
+
+        resultContent.appendChild(div);
+      });
+
+      // tampilkan ringkasan
+      summaryOverlay.classList.remove("hidden");
+    }
+
+    submitBtn.addEventListener("click", () => {
+      const confirmSubmit = confirm(
+        "Apakah kamu yakin ingin mengakhiri ujian?"
+      );
+      if (!confirmSubmit) return;
+      showResults(false);
+    });
+
+    // tombol di ringkasan
+    reviewBtn.addEventListener("click", () => {
+      summaryOverlay.classList.add("hidden");
+      resultOverlay.classList.remove("hidden");
+    });
+
+    summaryPrintBtn.addEventListener("click", () => {
+      window.print();
+    });
+
+    summaryCloseBtn.addEventListener("click", () => {
+      summaryOverlay.classList.add("hidden");
+    });
+
+    // tombol di overlay detail
+    printResultBtn.addEventListener("click", () => {
+      window.print();
+    });
+
+    closeResultBtn.addEventListener("click", () => {
+      resultOverlay.classList.add("hidden");
+    });
+
+    /* ------------ START OVERLAY ------------ */
+    startBtn.addEventListener("click", () => {
+      startOverlay.classList.add("hidden");
+      startTimer();
+    });
+
+    /* INIT */
+    updateTimerDisplay();
+    renderQuestionNumbers();
+    renderQuestion();
+
+  </script>
+
+  </script>
+</body>
+</html>
